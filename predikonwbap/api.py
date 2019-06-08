@@ -1,4 +1,4 @@
-from flask import jsonify
+from flask import jsonify, send_from_directory
 from predikondata import Result
 from predikonwbap import app
 import sqlite3
@@ -32,5 +32,6 @@ def get_data():
 
 @app.route('/get_votes')
 def get_votes():
-    res = query_db('SELECT municipality.ogd_id, result.num_yes, result.num_total FROM result, municipality, vote where result.municipality_id == municipality.id AND vote.id == result.vote_id AND vote.id == 3')
-    return jsonify({'data': res})
+    res = query_db('SELECT municipality.ogd_id, result.num_yes, result.num_total FROM result, municipality, vote where result.municipality_id == municipality.id AND vote.id == result.vote_id AND vote.id == 2')
+    dicti = dict((a,[b,c]) for a,b,c in res)
+    return jsonify({'data': dicti})
