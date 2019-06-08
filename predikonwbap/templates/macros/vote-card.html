@@ -1,0 +1,16 @@
+{% macro right_info(yes_percent, turnout, score_title, turnout_title) -%}
+{% if yes_percent > 50 %}
+<p class="yes-no text-success">Yes</p>
+{% else %}
+<p class="yes-no text-danger">No</p>
+{% endif %}
+<dl class="info-box row mb-0">
+  {{ _small_info(yes_percent, score_title, yes_percent) }}
+  {{ _small_info(turnout, turnout_title, yes_percent) }}
+</dl>
+{%- endmacro %}
+
+{% macro _small_info(value, title, yes_percent) -%}
+  <dt class="col-sm-7 h6 text-left pr-1 mb-0 text-{% if yes_percent > 50 %}success{% else %}danger{% endif %}">{{ title }}</dt>
+  <dd class="col-sm-5 text-right pl-1 mb-0 text-{% if yes_percent > 50 %}success{% else %}danger{% endif %}">{{ value }}%</dd>
+  {%- endmacro %}

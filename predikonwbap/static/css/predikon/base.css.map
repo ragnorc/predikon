@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAAA,UAAW;EACT,MAAM,EAAE,IAAI;;AAGd,IAAK;EACH,OAAO,EAAE,IAAI;EACb,cAAc,EAAE,MAAM;;AAGxB,KAAM;EACJ,IAAI,EAAE,QAAQ;EAEd,0BAAuB;IACrB,UAAU,EAAE,IAAI",
+"sources": ["../../sass/predikon/base.scss"],
+"names": [],
+"file": "base.css"
+}

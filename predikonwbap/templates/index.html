@@ -1,0 +1,56 @@
+{% extends "skeleton.html" %}
+{% block content %}
+
+<div class="section">
+  <div class="container">
+    {% for vote in votes %}
+    {% if loop.index0 % 3 == 0 %}
+    <div class="row">
+      {% endif %}
+      <div class="col-xs-12 col-md-4">
+        {% include "components/vote-card.html" %}
+      </div>
+      {% if loop.index0 % 3 == 2 %}
+    </div>
+    {% endif %}
+    {% endfor %}
+  </div>
+</div>
+<div class="section">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div style='height:400px; width:60%;border-radius: 15px;'  id='map'></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
+{% for vote in votes %}
+<script src="{{ url_for('static', filename='js/chart-{}.js'.format(vote.id)) }}"></script>
+{% endfor %}
+
+<script src="{{ url_for('static', filename='js/chart-326.js') }}"></script>
+
+<script type="text/javascript" charset="utf-8">
+function send(){
+  $.ajax({
+    type: "get",
+    url: "get_data",
+    success:function(data)
+    {
+      //console.log the response
+      console.log(data);
+      //Send another request in 10 seconds.
+      setTimeout(function(){
+        send();
+      }, 60000);
+    }
+  });
+}
+//Call our function
+// send();
+
+</script>
+
+{% endblock %}

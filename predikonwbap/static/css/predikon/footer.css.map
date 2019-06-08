@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AA2BA,OAAQ;EAEN,WAAW,EAAE,CAAC;EAEd,kBAAW;IACT,KAAK,EAAE,OAAO;IACd,OAAO,EAAE,SAAS;IAClB,SAAS,EAAE,IAAI;IACf,MAAM,EAAE,QAAQ;IAChB,WAAW,EAAE,IAAI;IACjB,UAAU,EAAE,MAAM",
+"sources": ["../../sass/predikon/footer.scss"],
+"names": [],
+"file": "footer.css"
+}

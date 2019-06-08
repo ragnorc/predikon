@@ -1,0 +1,51 @@
+{% extends "skeleton.html" %}
+
+{% block content %}
+<div class="section">
+  <div class="container">
+    <h3>What is this web site about?</h3>
+    <p>
+      Predikon is a website born out of an academic project by the Information and Network Dynamics Laboratory (<a href="https://indy.epfl.ch" target="_blank">INDY Lab</a>) at the Swiss Federal Institute for Technology in Lausanne (<a href="https://www.epfl.ch" target="_blank">EPFL</a>).
+      Its main goal is to provide predictions about votes in Switzerland, as soon as <strong>municipal results</strong> are published by Swiss cantons starting at 12:00 pm on the day of a vote.
+      As an example, we acurately predicted (a difference of less than 1%) the final result of the "Urban Sprawl Initiative" five minutes after noon, when only 35% of the citizen ballots were counted.
+      We are actively working on extending the functionalities available on the web site, notably to include interesting visualizations of voting patterns.
+    </p>
+
+    <h3>How do your predictions work?</h3>
+    <p>
+      We designed a predictive model of the municipal results (in percentage of "yes") for Swiss votes.
+      Based on past results, our model automatically learns <strong>features</strong> of municipalities.
+      On the day of a vote, and as soon as some municipalities publish their results (their percentage of "yes"), our model uses the features to predict the <em>unpublished</em> results of other municipalities.
+      The prediction of the national vote result is obtained by aggregating published results and predicted results.
+      We will soon release a <strong>technical report</strong> to explain in more details our methodology.
+    </p>
+
+    <h3>Where do the data come from?</h3>
+    <p>
+      We obtain both the past and the live data from the <a href="https://opendata.swiss/en/dataset/echtzeitdaten-am-abstimmungstag-zu-eidgenoessischen-abstimmungsvorlagen" target="_blank">new API</a> developed by the <a href="https://www.bfs.admin.ch/bfs/en/home.html" target="_blank">Swiss Federal Office for Statistics</a>.
+    </p>
+
+    <h3>Where can I find the former version of Predikon?</h3>
+    <p>
+      It is availbale <a href="http://archive.predikon.ch" target="_blank">here</a>.
+      The former version of Predikon contains interesting visualizations of voting patterns in Switzerland.
+    </p>
+
+    <h3>Who are you?</h3>
+    <p>
+    We are a team of researchers from the <a href="https://indy.epfl.ch" target="_blank">INDY Lab</a> at <a href="https://www.epfl.ch" target="_blank">EPFL</a>.
+    </p>
+    <ul>
+      <li><a href="http://victorkristof.me/" target="_blank">Victor Kristof</a></li>
+      <li>Alexander Immer</li>
+      <li><a href="http://icapeople.epfl.ch/grossglauser/" target="_blank">Matthias Grossglauser</a></li>
+      <li><a href="http://people.epfl.ch/patrick.thiran" target="_blank">Patrick Thiran</a></li>
+    </ul>
+
+    <h3>How can I contact you?</h3>
+    <a href="mailto:contact@predikon.ch">Drop us a line!</a>
+  </div>
+</div>
+
+
+{% endblock %}

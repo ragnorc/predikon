@@ -1,0 +1,8 @@
+# Python
+*.pyc
+predikonwbap/__pycache__
+predikonwbap/predikon.db
+predikonwbap.egg-info
+
+# CSS
+.sass-cache

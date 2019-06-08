@@ -1,0 +1,15 @@
+body, html {
+  height: 100%; }
+
+body {
+  display: flex;
+  flex-direction: column; }
+
+#main {
+  flex: 1 0 auto; }
+  #main .section:first-child {
+    margin-top: 20px; }
+  
+
+
+/*# sourceMappingURL=base.css.map */

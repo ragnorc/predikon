@@ -1,0 +1,42 @@
+{% from 'macros/vote-card.html' import right_info  %}
+<div class="card vote-card">
+  <div class="card-body">
+    <h5 class="card-title">{% if vote.is_live %}<span class="live-indicator"><i class="fas fa-circle"></i></span>{% endif %} {{ vote.title }}</h5>
+
+
+    {% if vote.is_live %}
+    <div class="row">
+      <div class="col-sm-6">
+        <h6 class="text-muted">Counting</h6>
+        <div class="progress">
+          <div class="progress-bar progress-bar-info" role="progressbar" style="width: {{ vote.counting }}%" aria-valuenow="{{ vote.counting }}" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+      </div>
+      <div class="col-sm-6">
+        {{ right_info(vote.prediction, vote.count, 'Prediction', 'Count') }}
+      </div>
+    </div>
+    {% elif vote.is_final %}
+    <div class="row">
+      <div class="col col-sm-6 pr-0">
+        <!-- Display prediction plot. -->
+        <canvas id="plot-{{ vote.id }}" data-predictions="{{ vote.predictions }}" style="height: 1px;"></canvas>
+      </div>
+      <div class="col col-sm-6">
+        {{ right_info(vote.yes_percent, vote.turnout, 'Result', 'Turnout') }}
+      </div>
+    </div>
+    {% else %}
+    <p class="placeholder">
+      Next prediction starting at 12:00pm on {{ vote.vote_day }}
+    </p>
+    {% endif %}
+
+    <!-- <p class="card-text">With supporting text below as a natural lead-in to additional content.</p> -->
+    <!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
+  </div>
+</div>
+
+
+
+
