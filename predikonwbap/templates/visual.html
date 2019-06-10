@@ -89,7 +89,7 @@ d3.json("/static/mcp.json",function(error,geodata) {
            
             if (typeof dbdata.data[municip] !== 'undefined')
             {
-              geodata.features[n].properties.votePercentage = dbdata.data[municip].numYes/dbdata.data[municip].total;
+              geodata.features[n].properties.votePercentage = dbdata.data[municip].numYes/dbdata.data[municip].numTotal;
             }
            
             else {
