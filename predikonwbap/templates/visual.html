@@ -111,6 +111,7 @@ d3.json("/static/ch_municipalities.json",function(error,geodata) {
               geodata.features[n].properties.votePercentage = dbdata.data[municip].numYes/dbdata.data[municip].numTotal;
               geodata.features[n].properties.pop = dbdata.data[municip].pop;
               geodata.features[n].properties.area = dbdata.data[municip].area;
+              geodata.features[n].properties.name = dbdata.data[municip].name;
             }
            
             else {
@@ -144,6 +145,7 @@ d3.json("/static/ch_municipalities.json",function(error,geodata) {
           .css("display","block")
       $('#pop').html('Population: '+d.properties.pop)
       $('#area').html('Area: '+d.properties.id)
+      $('#mcp').html(d.properties.name)
      
     })
     .on("mouseout", function(d) {
