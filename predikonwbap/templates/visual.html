@@ -96,17 +96,18 @@ var zoom = d3.behavior.zoom()
 
 svg.call(zoom);
 
-d3.json("/static/mcp.json",function(error,geodata) {
+d3.json("/static/ch_municipalities.json",function(error,geodata) {
   if (error) return console.log(error); //unknown error, check the console
 
   d3.json("/get_vote_results/"+voteId,function(error,dbdata) { 
   if (error) return console.log(error); //unknown error, check the console
 
           for(var n = 0; n < geodata.features.length; n++){
-            var municip = geodata.features[n].properties.id;
+            var municip = geodata.features[n].properties.GMDNR;
            
             if (typeof dbdata.data[municip] !== 'undefined')
             {
+              geodata.features[n].properties.id = municip;
               geodata.features[n].properties.votePercentage = dbdata.data[municip].numYes/dbdata.data[municip].numTotal;
               geodata.features[n].properties.pop = dbdata.data[municip].pop;
               geodata.features[n].properties.area = dbdata.data[municip].area;
