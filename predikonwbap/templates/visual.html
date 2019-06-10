@@ -1,6 +1,24 @@
 {% extends "skeleton.html" %}
 
 {% block content %}
+<div style="display:none;
+position: absolute;
+top: 0px;
+left: 0px;
+z-index: 1;
+background-color: #ffffff;
+color: rgb(0, 0, 0);
+height:300px;
+width:200px;
+border: 1px solid rgb(0, 0, 0);
+border-radius: 5px;
+padding: 5px;
+font-size:10px;
+font-family: arial" id="info-box">
+<h3 id="mcp"></h3>
+<p id="pop"></p>
+<p id="area"></p>
+</div>
 <div class="section">
   <div class="container">
       <select style="max-width:200px;" id="voteSelect">
@@ -90,6 +108,8 @@ d3.json("/static/mcp.json",function(error,geodata) {
             if (typeof dbdata.data[municip] !== 'undefined')
             {
               geodata.features[n].properties.votePercentage = dbdata.data[municip].numYes/dbdata.data[municip].numTotal;
+              geodata.features[n].properties.pop = dbdata.data[municip].pop;
+              geodata.features[n].properties.area = dbdata.data[municip].area;
             }
            
             else {
@@ -113,26 +133,42 @@ d3.json("/static/mcp.json",function(error,geodata) {
 
            return getColorForPercentage(votePercentage);
 
-          });
+          })
+    .on("mouseover", function(d) {
+     var box = $('#info-box');
+    
+       
+      box.css("left", (d3.event.pageX - 300) + "px")		
+          .css("top", (d3.event.pageY - 50) + "px")
+          .css("display","block")
+      $('#pop').html('Population: '+d.properties.pop)
+      $('#area').html('Area: '+d.properties.id)
+     
+    })
+    .on("mouseout", function(d) {
+      $('#info-box').css("display","none")
+       });
 
   });
 });
-};
-// Add optional onClick events for features here
-// d.properties contains the attributes (e.g. d.properties.name, d.properties.population)
-function clicked(d,i) {
-
-}
-
 
 //Update map on zoom/pan
 function zoomed() {
   features.attr("transform", "translate(" + zoom.translate() + ")scale(" + zoom.scale() + ")")
       .selectAll("path").style("stroke-width", 1 / zoom.scale() + "px" );
 }
+// Add optional onClick events for features here
+// d.properties contains the attributes (e.g. d.properties.name, d.properties.population)
+function clicked(d,i) {
+
+}
+
+};
+
 
 // Draw first map
 drawMap($( "#voteSelect" ).val());
+
 
 $( "#voteSelect" ).change(function() {
   drawMap($( this ).val());
