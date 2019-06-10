@@ -3,6 +3,11 @@
 {% block content %}
 <div class="section">
   <div class="container">
+      <select style="max-width:200px;" id="voteSelect">
+          {% for vote in voteList %}
+          <option value="{{vote.id}}">{{vote.title}}</option>
+          {% endfor %}
+      </select>
    <div id="mapContainer" class="row justify-content-center">
        
     
@@ -53,7 +58,10 @@ var projection = d3.geo.mercator()
 var path = d3.geo.path()
     .projection(projection);
 
+var drawMap = function(voteId)
+{
 //Create an SVG
+d3.select("svg").remove();
 var svg = d3.select("#mapContainer").append("svg")
     .attr("width", width)
     .attr("height", height);
@@ -73,17 +81,15 @@ svg.call(zoom);
 d3.json("/static/mcp.json",function(error,geodata) {
   if (error) return console.log(error); //unknown error, check the console
 
-  d3.json("/get_votes",function(error,dbdata) { 
+  d3.json("/get_vote_results/"+voteId,function(error,dbdata) { 
   if (error) return console.log(error); //unknown error, check the console
 
           for(var n = 0; n < geodata.features.length; n++){
-
-         
             var municip = geodata.features[n].properties.id;
            
             if (typeof dbdata.data[municip] !== 'undefined')
             {
-              geodata.features[n].properties.votePercentage = dbdata.data[municip][0]/dbdata.data[municip][1];
+              geodata.features[n].properties.votePercentage = dbdata.data[municip].numYes/dbdata.data[municip].total;
             }
            
             else {
@@ -93,12 +99,6 @@ d3.json("/static/mcp.json",function(error,geodata) {
 
           
           }
-        
-
-
-
-
-
 
   //Create a path for each map feature in the data
   features.selectAll("path")
@@ -117,7 +117,7 @@ d3.json("/static/mcp.json",function(error,geodata) {
 
   });
 });
-
+};
 // Add optional onClick events for features here
 // d.properties contains the attributes (e.g. d.properties.name, d.properties.population)
 function clicked(d,i) {
@@ -131,64 +131,14 @@ function zoomed() {
       .selectAll("path").style("stroke-width", 1 / zoom.scale() + "px" );
 }
 
+// Draw first map
+drawMap($( "#voteSelect" ).val());
+
+$( "#voteSelect" ).change(function() {
+  drawMap($( this ).val());
+});
+
 </script>
 
-
-
-
-
-
-
-
-<script type="text/javascript" charset="utf-8">
-$(document).ready(function(){
-
-var percentColors = [
-    { pct: 0.0, color: { r: 0xff, g: 0x00, b: 0 } },
-    { pct: 0.5, color: { r: 0xff, g: 0xff, b: 0 } },
-    { pct: 1.0, color: { r: 0x00, g: 0xff, b: 0 } } ];
-
-var getColorForPercentage = function(pct) {
-    for (var i = 1; i < percentColors.length - 1; i++) {
-        if (pct < percentColors[i].pct) {
-            break;
-        }
-    }
-    var lower = percentColors[i - 1];
-    var upper = percentColors[i];
-    var range = upper.pct - lower.pct;
-    var rangePct = (pct - lower.pct) / range;
-    var pctLower = 1 - rangePct;
-    var pctUpper = rangePct;
-    var color = {
-        r: Math.floor(lower.color.r * pctLower + upper.color.r * pctUpper),
-        g: Math.floor(lower.color.g * pctLower + upper.color.g * pctUpper),
-        b: Math.floor(lower.color.b * pctLower + upper.color.b * pctUpper)
-    };
-    return 'rgb(' + [color.r, color.g, color.b].join(',') + ')';
-    // or output as hex if preferred
-}  
-  $.ajax({
-    type: "get",
-    url: "get_votes",
-    success:function(data)
-    {
-      //console.log the response
-      console.log(data);
-      $.each(data.data, function( index, row ) {
-        $('.thenmap').find('path[thenmap\\:shapeid='+row[0]+']').css({ fill: getColorForPercentage(row[1]/row[2]) });
-
-     
-});
-     
-    },
-    error:function(err) 
-    {
-        console.log(err)
-    }
-  });
-
-});
-</script>
 
 {% endblock %}

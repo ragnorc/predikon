@@ -1,8 +1,9 @@
 from datetime import datetime as dt
 from datetime import time
-from flask import render_template
+from flask import render_template, g
 from predikondata import Vote, Prediction, Result
 from predikonwbap import app
+import sqlite3
 
 # State variables.
 NOW = dt.now
@@ -25,6 +26,25 @@ def format_number(num, percent=False):
             return float(f'{num:.2f}')
     else:
         return 0
+
+
+def get_db():
+    db = getattr(g, '_database', None)
+    if db is None:
+        db = g._database = sqlite3.connect('predikon.db')
+    return db
+
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
+
+def query_db(query, args=(), one=False):
+    cur = get_db().execute(query, args)
+    rv = cur.fetchall()
+    cur.close()
+    return (rv[0] if rv else None) if one else rv
 
 
 @app.route('/')
@@ -92,5 +112,8 @@ def about():
 
 @app.route('/visual')
 def visual():
-    return render_template('visual.html')
+    res = query_db('SELECT id, title_fr from vote')
+    voteList = [{'id': id, 'title' : title} for id,title in res]
+    print(voteList)
+    return render_template('visual.html', voteList=voteList)
 

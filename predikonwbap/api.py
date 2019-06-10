@@ -30,8 +30,8 @@ def get_data():
     return jsonify({'data': res.id})
 
 
-@app.route('/get_votes')
-def get_votes():
-    res = query_db('SELECT municipality.ogd_id, result.num_yes, result.num_total FROM result, municipality, vote where result.municipality_id == municipality.id AND vote.id == result.vote_id AND vote.id == 2')
-    dicti = dict((a,[b,c]) for a,b,c in res)
-    return jsonify({'data': dicti})
+@app.route('/get_vote_results/<int:id>')
+def get_vote_results(id):
+    res = query_db('SELECT municipality.ogd_id, result.num_yes, result.num_total FROM result, municipality, vote where result.municipality_id == municipality.id AND vote.id == result.vote_id AND vote.id =={}'.format(id))
+    voteDict = {a : { "numYes": b, "total" : c} for a,b,c in res}
+    return jsonify({'data': voteDict})
