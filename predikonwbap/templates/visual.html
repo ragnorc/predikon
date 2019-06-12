@@ -1,7 +1,20 @@
 {% extends "skeleton.html" %}
 
 {% block content %}
-<div style="display:none;
+
+<div class="section">
+  <div class="container">
+    <select style="max-width:200px;" id="voteSelect">
+      {% for vote in voteList %}
+      <option value="{{vote.id}}">{{vote.title}}</option>
+      {% endfor %}
+    </select>
+    <div id="mapContainer" class="row justify-content-center">
+
+
+    </div>
+  </div>
+  <div style="display:none;
 position: absolute;
 top: 0px;
 left: 0px;
@@ -15,37 +28,48 @@ border-radius: 5px;
 padding: 5px;
 font-size:10px;
 font-family: arial" id="info-box">
-<h3 id="mcp"></h3>
-<p id="pop"></p>
-<p id="area"></p>
-</div>
-<div class="section">
-  <div class="container">
-      <select style="max-width:200px;" id="voteSelect">
-          {% for vote in voteList %}
-          <option value="{{vote.id}}">{{vote.title}}</option>
-          {% endfor %}
-      </select>
-   <div id="mapContainer" class="row justify-content-center">
-       
-    
+    <img style="width:30px;height:30px" id="flag"></img>
+    <h3 id="mcp"></h3>
+    <p id="pop"></p>
+    <p id="area"></p>
   </div>
- </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script>
-var percentColors = [
-    { pct: 0.0, color: { r: 0xff, g: 0x00, b: 0 } },
-    { pct: 0.5, color: { r: 0xff, g: 0xff, b: 0 } },
-    { pct: 1.0, color: { r: 0x00, g: 0xff, b: 0 } } ];
+  var percentColors = [{
+      pct: 0.0,
+      color: {
+        r: 0xff,
+        g: 0x00,
+        b: 0
+      }
+    },
+    {
+      pct: 0.5,
+      color: {
+        r: 0xff,
+        g: 0xff,
+        b: 0
+      }
+    },
+    {
+      pct: 1.0,
+      color: {
+        r: 0x00,
+        g: 0xff,
+        b: 0
+      }
+    }
+  ];
 
-var getColorForPercentage = function(pct) {
+  var getColorForPercentage = function (pct) {
     for (var i = 1; i < percentColors.length - 1; i++) {
-        if (pct < percentColors[i].pct) {
-            break;
-        }
+      if (pct < percentColors[i].pct) {
+        break;
+      }
     }
     var lower = percentColors[i - 1];
     var upper = percentColors[i];
@@ -54,129 +78,128 @@ var getColorForPercentage = function(pct) {
     var pctLower = 1 - rangePct;
     var pctUpper = rangePct;
     var color = {
-        r: Math.floor(lower.color.r * pctLower + upper.color.r * pctUpper),
-        g: Math.floor(lower.color.g * pctLower + upper.color.g * pctUpper),
-        b: Math.floor(lower.color.b * pctLower + upper.color.b * pctUpper)
+      r: Math.floor(lower.color.r * pctLower + upper.color.r * pctUpper),
+      g: Math.floor(lower.color.g * pctLower + upper.color.g * pctUpper),
+      b: Math.floor(lower.color.b * pctLower + upper.color.b * pctUpper)
     };
     return 'rgb(' + [color.r, color.g, color.b].join(',') + ')';
     // or output as hex if preferred
-}  
+  }
 
-//Map dimensions (in pixels)
-var width = 600,
+  //Map dimensions (in pixels)
+  var width = 600,
     height = 385;
 
-//Map projection
-var projection = d3.geo.mercator()
+  //Map projection
+  var projection = d3.geo.mercator()
     .scale(7199.647436311883)
-    .center([8.223981,46.82243520556143]) //projection center
-    .translate([width/2,height/2]) //translate to center the map in view
+    .center([8.223981, 46.82243520556143]) //projection center
+    .translate([width / 2, height / 2]) //translate to center the map in view
 
-//Generate paths based on projection
-var path = d3.geo.path()
+  //Generate paths based on projection
+  var path = d3.geo.path()
     .projection(projection);
 
-var drawMap = function(voteId)
-{
-//Create an SVG
-d3.select("svg").remove();
-var svg = d3.select("#mapContainer").append("svg")
-    .attr("width", width)
-    .attr("height", height);
+  var drawMap = function (voteId) {
+    //Create an SVG
+    d3.select("svg").remove();
+    var svg = d3.select("#mapContainer").append("svg")
+      .attr("width", width)
+      .attr("height", height);
 
-//Group for the map features
-var features = svg.append("g")
-    .attr("class","features");
+    //Group for the map features
+    var features = svg.append("g")
+      .attr("class", "features");
 
-//Create zoom/pan listener
-//Change [1,Infinity] to adjust the min/max zoom scale
-var zoom = d3.behavior.zoom()
-    .scaleExtent([1, Infinity])
-    .on("zoom",zoomed);
+    //Create zoom/pan listener
+    //Change [1,Infinity] to adjust the min/max zoom scale
+    var zoom = d3.behavior.zoom()
+      .scaleExtent([1, Infinity])
+      .on("zoom", zoomed);
 
-svg.call(zoom);
+    svg.call(zoom);
 
-d3.json("/static/ch_municipalities.json",function(error,geodata) {
-  if (error) return console.log(error); //unknown error, check the console
+    d3.json("/static/swiss.json", function (error, geodata) {
+      if (error) return console.log(error); //unknown error, check the console
 
-  d3.json("/get_vote_results/"+voteId,function(error,dbdata) { 
-  if (error) return console.log(error); //unknown error, check the console
+      d3.json("/get_vote_results/" + voteId, function (error, dbdata) {
+        if (error) return console.log(error); //unknown error, check the console
 
-          for(var n = 0; n < geodata.features.length; n++){
-            var municip = geodata.features[n].properties.GMDNR;
-           
-            if (typeof dbdata.data[municip] !== 'undefined')
-            {
-              geodata.features[n].properties.id = municip;
-              geodata.features[n].properties.votePercentage = dbdata.data[municip].numYes/dbdata.data[municip].numTotal;
-              geodata.features[n].properties.pop = dbdata.data[municip].pop;
-              geodata.features[n].properties.area = dbdata.data[municip].area;
-              geodata.features[n].properties.name = dbdata.data[municip].name;
-            }
-           
-            else {
-              console.log(municip)
-            }
-              
+        for (var n = 0; n < geodata.features.length; n++) {
+          var municip = geodata.features[n].properties.shapeid;
 
-          
+          if (typeof dbdata.data[municip] !== 'undefined') {
+            geodata.features[n].properties.id = municip;
+            geodata.features[n].properties.votePercentage = dbdata.data[municip].numYes / dbdata.data[municip]
+              .numTotal;
+            geodata.features[n].properties.pop = dbdata.data[municip].pop;
+            geodata.features[n].properties.area = dbdata.data[municip].area;
+            geodata.features[n].properties.name = dbdata.data[municip].name;
+            geodata.features[n].properties.flag = dbdata.data[municip].flag;
+          } else {
+            console.log(municip)
           }
 
-  //Create a path for each map feature in the data
-  features.selectAll("path")
-    .data(geodata.features)
-    .enter()
-    .append("path")
-    .attr("d",path)
-    .on("click",clicked)
-    .style("fill", function(d){
+
+
+        }
+
+        //Create a path for each map feature in the data
+        features.selectAll("path")
+          .data(geodata.features)
+          .enter()
+          .append("path")
+          .attr("d", path)
+          .on("click", clicked)
+          .style("fill", function (d) {
             //get the data value
             var votePercentage = d.properties.votePercentage;
 
-           return getColorForPercentage(votePercentage);
+            return getColorForPercentage(votePercentage);
 
           })
-    .on("mouseover", function(d) {
-     var box = $('#info-box');
-    
-       
-      box.css("left", (d3.event.pageX - 300) + "px")		
-          .css("top", (d3.event.pageY - 50) + "px")
-          .css("display","block")
-      $('#pop').html('Population: '+d.properties.pop)
-      $('#area').html('Area: '+d.properties.id)
-      $('#mcp').html(d.properties.name)
-     
-    })
-    .on("mouseout", function(d) {
-      $('#info-box').css("display","none")
-       });
+          .on("mouseover", function (d) {
+            var box = $('#info-box');
 
+
+            box.css("left", (d3.event.pageX - 300) + "px")
+              .css("top", (d3.event.pageY - 50) + "px")
+              .css("display", "block")
+            $('#pop').html('<strong>Population:</strong> ' + d.properties.pop)
+            $('#area').html('Area: ' + d.properties.id)
+            $('#mcp').html('<strong>' + d.properties.name + '</strong>')
+            $('#flag').attr("src", d.properties.flag)
+
+          })
+          .on("mouseout", function (d) {
+            $('#info-box').css("display", "none")
+          });
+
+      });
+    });
+
+    //Update map on zoom/pan
+    function zoomed() {
+      features.attr("transform", "translate(" + zoom.translate() + ")scale(" + zoom.scale() + ")")
+        .selectAll("path").style("stroke-width", 1 / zoom.scale() + "px");
+    }
+    // Add optional onClick events for features here
+    // d.properties contains the attributes (e.g. d.properties.name, d.properties.population)
+    function clicked(d, i) {
+
+
+    }
+
+  };
+
+
+  // Draw first map
+  drawMap($("#voteSelect").val());
+
+
+  $("#voteSelect").change(function () {
+    drawMap($(this).val());
   });
-});
-
-//Update map on zoom/pan
-function zoomed() {
-  features.attr("transform", "translate(" + zoom.translate() + ")scale(" + zoom.scale() + ")")
-      .selectAll("path").style("stroke-width", 1 / zoom.scale() + "px" );
-}
-// Add optional onClick events for features here
-// d.properties contains the attributes (e.g. d.properties.name, d.properties.population)
-function clicked(d,i) {
-
-}
-
-};
-
-
-// Draw first map
-drawMap($( "#voteSelect" ).val());
-
-
-$( "#voteSelect" ).change(function() {
-  drawMap($( this ).val());
-});
-
 </script>
 
 
