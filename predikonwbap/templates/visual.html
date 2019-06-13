@@ -24,13 +24,16 @@ color: rgb(0, 0, 0);
 height:300px;
 width:200px;
 border: 1px solid rgb(0, 0, 0);
-border-radius: 5px;
+border-radius: 7px;
+box-shadow: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
 padding: 5px;
 font-size:10px;
 font-family: arial" id="info-box">
-    <img style="width:30px;height:30px" id="flag"></img>
-    <h3 id="mcp"></h3>
-    <p id="pop"></p>
+    <div style="justify-content: center">
+      <img style="width:30px;height:30px; float: left; margin: 10px" id="flag"></img>
+      <p id="mcp"></p>
+    </div>
+    <p style="margin-top:30px" id="pop"></p>
     <p id="area"></p>
   </div>
 </div>
@@ -166,7 +169,7 @@ font-family: arial" id="info-box">
               .css("top", (d3.event.pageY - 50) + "px")
               .css("display", "block")
             $('#pop').html('<strong>Population:</strong> ' + d.properties.pop)
-            $('#area').html('Area: ' + d.properties.id)
+            $('#area').html('<strong>Area:</strong> ' + +d.properties.id)
             $('#mcp').html('<strong>' + d.properties.name + '</strong>')
             $('#flag').attr("src", d.properties.flag)
 
