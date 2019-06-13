@@ -156,9 +156,14 @@ font-family: arial" id="info-box">
           .on("click", clicked)
           .style("fill", function (d) {
             //get the data value
-            var votePercentage = d.properties.votePercentage;
+            if (typeof d.properties.votePercentage !== 'undefined') {
+              var votePercentage = d.properties.votePercentage;
 
-            return getColorForPercentage(votePercentage);
+              return getColorForPercentage(votePercentage);
+            } else {
+
+              return "#83E1F8";
+            }
 
           })
           .on("mouseover", function (d) {
@@ -169,7 +174,7 @@ font-family: arial" id="info-box">
               .css("top", (d3.event.pageY - 50) + "px")
               .css("display", "block")
             $('#pop').html('<strong>Population:</strong> ' + d.properties.pop)
-            $('#area').html('<strong>Area:</strong> ' + +d.properties.id)
+            $('#area').html('<strong>Area:</strong> ' + +d.properties.area)
             $('#mcp').html('<strong>' + d.properties.name + '</strong>')
             $('#flag').attr("src", d.properties.flag)
 
