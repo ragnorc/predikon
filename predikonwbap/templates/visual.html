@@ -41,6 +41,9 @@ font-family: arial" id="info-box">
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"
   integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <script src="http://d3js.org/d3.v3.min.js"></script>
+
+<script src="../static/js/paper-kit.js"></script>
+<script src="../static/js/d3-bootstrap.js"></script>
 <script>
   var percentColors = [{
       pct: 0.0,
@@ -139,8 +142,6 @@ font-family: arial" id="info-box">
             geodata.features[n].properties.area = dbdata.data[municip].area;
             geodata.features[n].properties.name = dbdata.data[municip].name;
             geodata.features[n].properties.flag = dbdata.data[municip].flag;
-          } else {
-            console.log(municip)
           }
 
 
@@ -167,9 +168,10 @@ font-family: arial" id="info-box">
 
           })
           .on("mouseover", function (d) {
+
+
+
             var box = $('#info-box');
-
-
             box.css("left", (d3.event.pageX - 300) + "px")
               .css("top", (d3.event.pageY - 50) + "px")
               .css("display", "block")
