@@ -112,18 +112,24 @@ font-family: arial" id="info-box">
 
         // Add X axis
         var x = d3.scaleLinear()
-            .domain([4, -4])
-            .range([0, width]);
-        svg.append("g")
-            .attr("transform", "translate(0," + height + ")")
-            .call(d3.axisBottom(x));
+            .domain([2.5, -2.5])
+            .range([0, width])
 
         // Add Y axis
         var y = d3.scaleLinear()
-            .domain([-4, 4])
+            .domain([-2.5, 2.5])
             .range([0, height]);
         svg.append("g")
-            .call(d3.axisLeft(y));
+            .attr("transform", "translate(0," + y(0) + ")")
+            .call(d3.axisBottom(x).tickSize(0))
+            .selectAll("text").remove()
+
+
+        svg.append("g")
+            .attr("transform", "translate(" + x(0) + ",0)")
+            .call(d3.axisLeft(y).tickSize(0))
+            .selectAll("text").remove();
+
 
         // Add dots
         svg.append('g')
