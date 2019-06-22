@@ -127,7 +127,7 @@ font-family: arial" id="info-box">
 
     svg.call(zoom);
 
-    d3.json("/static/swiss.json", function (error, geodata) {
+    d3.json("/static/swiss-mcp.json", function (error, geodata) {
       if (error) return console.log(error); //unknown error, check the console
 
       d3.json("/get_vote_results/" + voteId, function (error, dbdata) {
