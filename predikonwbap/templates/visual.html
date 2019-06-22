@@ -21,7 +21,7 @@ left: 0px;
 z-index: 1;
 background-color: #ffffff;
 color: rgb(0, 0, 0);
-height:300px;
+height:250px;
 width:200px;
 border: 1px solid rgb(0, 0, 0);
 border-radius: 7px;
@@ -35,6 +35,8 @@ font-family: arial" id="info-box">
     </div>
     <p style="margin-top:30px" id="pop"></p>
     <p id="area"></p>
+    <p id="pc"></p>
+    <p id="language"></p>
   </div>
 </div>
 
@@ -142,6 +144,9 @@ font-family: arial" id="info-box">
             geodata.features[n].properties.area = dbdata.data[municip].area;
             geodata.features[n].properties.name = dbdata.data[municip].name;
             geodata.features[n].properties.flag = dbdata.data[municip].flag;
+            geodata.features[n].properties.pc = dbdata.data[municip].postal_code;
+            geodata.features[n].properties.language = dbdata.data[municip].language;
+
           }
 
 
@@ -169,14 +174,14 @@ font-family: arial" id="info-box">
           })
           .on("mouseover", function (d) {
 
-
-
             var box = $('#info-box');
-            box.css("left", (d3.event.pageX - 300) + "px")
+            box.css("left", (d3.event.pageX - 250) + "px")
               .css("top", (d3.event.pageY - 50) + "px")
               .css("display", "block")
             $('#pop').html('<strong>Population:</strong> ' + d.properties.pop)
-            $('#area').html('<strong>Area:</strong> ' + +d.properties.area)
+            $('#area').html('<strong>Area:</strong> ' + d.properties.area + ' km2')
+            $('#language').html('<strong>Language:</strong> ' + d.properties.language)
+            $('#pc').html('<strong>Postal Code:</strong> ' + d.properties.pc)
             $('#mcp').html('<strong>' + d.properties.name + '</strong>')
             $('#flag').attr("src", d.properties.flag)
 
