@@ -110,6 +110,12 @@ def about():
     return render_template('about.html')
 
 
+@app.route('/patterns')
+def patterns():
+    return render_template('patterns.html')
+
+
+
 @app.route('/visual')
 def visual():
     res = query_db('SELECT id, title_fr from vote')

@@ -1,0 +1,149 @@
+{% extends "skeleton.html" %}
+
+{% block content %}
+
+<div class="section">
+    <div class="container">
+        <div id="mapContainer" class="row justify-content-center">
+
+
+        </div>
+    </div>
+    <div style="display:none;
+position: absolute;
+top: 0px;
+left: 0px;
+z-index: 1;
+background-color: #ffffff;
+color: rgb(0, 0, 0);
+height:300px;
+width:200px;
+border: 1px solid rgb(0, 0, 0);
+border-radius: 7px;
+box-shadow: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
+padding: 5px;
+font-size:10px;
+font-family: arial" id="info-box">
+        <div style="justify-content: center">
+            <img style="width:30px;height:30px; float: left; margin: 10px" id="flag"></img>
+            <p id="mcp"></p>
+        </div>
+        <p style="margin-top:30px" id="pop"></p>
+        <p id="area"></p>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="http://d3js.org/d3.v4.min.js"></script>
+
+<script src="../static/js/paper-kit.js"></script>
+<script src="../static/js/d3-bootstrap.js"></script>
+<script>
+    var percentColors = [{
+            pct: 0.0,
+            color: {
+                r: 0xff,
+                g: 0x00,
+                b: 0
+            }
+        },
+        {
+            pct: 0.5,
+            color: {
+                r: 0xff,
+                g: 0xff,
+                b: 0
+            }
+        },
+        {
+            pct: 1.0,
+            color: {
+                r: 0x00,
+                g: 0x80,
+                b: 0
+            }
+        }
+    ];
+
+    var getColorForPercentage = function (pct) {
+        for (var i = 1; i < percentColors.length - 1; i++) {
+            if (pct < percentColors[i].pct) {
+                break;
+            }
+        }
+        var lower = percentColors[i - 1];
+        var upper = percentColors[i];
+        var range = upper.pct - lower.pct;
+        var rangePct = (pct - lower.pct) / range;
+        var pctLower = 1 - rangePct;
+        var pctUpper = rangePct;
+        var color = {
+            r: Math.floor(lower.color.r * pctLower + upper.color.r * pctUpper),
+            g: Math.floor(lower.color.g * pctLower + upper.color.g * pctUpper),
+            b: Math.floor(lower.color.b * pctLower + upper.color.b * pctUpper)
+        };
+        return 'rgb(' + [color.r, color.g, color.b].join(',') + ')';
+        // or output as hex if preferred
+    }
+
+
+
+    // set the dimensions and margins of the graph
+    var margin = {
+            top: 10,
+            right: 30,
+            bottom: 30,
+            left: 60
+        },
+        width = 460 - margin.left - margin.right,
+        height = 400 - margin.top - margin.bottom;
+
+    var svg = d3.select("#mapContainer").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform",
+            "translate(" + margin.left + "," + margin.top + ")")
+
+
+    d3.csv("/static/voteMatrix.csv", function (error, data) {
+        if (error) return console.log(error); //unknown error, check the console
+
+        // Add X axis
+        var x = d3.scaleLinear()
+            .domain([4, -4])
+            .range([0, width]);
+        svg.append("g")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x));
+
+        // Add Y axis
+        var y = d3.scaleLinear()
+            .domain([-4, 4])
+            .range([0, height]);
+        svg.append("g")
+            .call(d3.axisLeft(y));
+
+        // Add dots
+        svg.append('g')
+            .selectAll("dot")
+            .data(data)
+            .enter()
+            .append("circle")
+            .attr("cx", function (d) {
+                return x(d.x);
+            })
+            .attr("cy", function (d) {
+                return y(d.y);
+            })
+            .attr("r", 1.5)
+            .style("fill", "#69b3a2")
+
+
+
+    });
+</script>
+
+
+{% endblock %}
