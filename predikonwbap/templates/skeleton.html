@@ -26,7 +26,8 @@
   <!-- <link href="{{ url_for('static', filename='css/nucleo-icons.css') }}" rel="stylesheet" /> -->
   <!--     JS files needing pre-initalisation     -->
   <script src="{{ url_for('static', filename='js/jquery-3.2.1.js') }}" type="text/javascript"></script>
-  <script src="{{ url_for('static', filename='js/search.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/search.min.js') }}" type="text/javascript"></script>
+
 </head>
 
 <body>
@@ -65,6 +66,66 @@
 <!--  Paper Kit Initialization snd functons -->
 <script src="{{ url_for('static', filename='js/paper-kit.js') }}"></script>
 
+<script type="text/javascript">
+  var categoryContent = [{
+      category: 'South America',
+      title: 'Brazil'
+    },
+    {
+      category: 'South America',
+      title: 'Peru'
+    },
+    {
+      category: 'North America',
+      title: 'Canada'
+    },
+    {
+      category: 'Asia',
+      title: 'South Korea'
+    },
+    {
+      category: 'Asia',
+      title: 'Japan'
+    },
+    {
+      category: 'Asia',
+      title: 'China'
+    },
+    {
+      category: 'Europe',
+      title: 'Denmark'
+    },
+    {
+      category: 'Europe',
+      title: 'England'
+    },
+    {
+      category: 'Europe',
+      title: 'France'
+    },
+    {
+      category: 'Europe',
+      title: 'Germany'
+    },
+    {
+      category: 'Africa',
+      title: 'Ethiopia'
+    },
+    {
+      category: 'Africa',
+      title: 'Nigeria'
+    },
+    {
+      category: 'Africa',
+      title: 'Zimbabwe'
+    },
+  ];
+  $('.ui.search')
+    .search({
+      type: 'category',
+      source: categoryContent
+    });
+</script>
 
 <!-- Optional JavaScript -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->

@@ -38,8 +38,6 @@ font-family: arial" id="info-box">
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.3.1.min.js"
-    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <script src="http://d3js.org/d3.v4.min.js"></script>
 <script>
     // set the dimensions and margins of the graph
@@ -270,12 +268,6 @@ font-family: arial" id="info-box">
     function zoomed() {
         features.attr("transform", "translate(" + zoom2.translate() + ")scale(" + zoom2.scale() + ")")
             .selectAll("path").style("stroke-width", 1 / zoom2.scale() + "px");
-    }
-    // Add optional onClick events for features here
-    // d.properties contains the attributes (e.g. d.properties.name, d.properties.population)
-    function clicked(d, i) {
-
-
     }
 </script>
 
