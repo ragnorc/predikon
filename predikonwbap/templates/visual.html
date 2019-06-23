@@ -39,9 +39,6 @@ font-family: arial" id="info-box">
     <p id="language"></p>
   </div>
 </div>
-
-<script src="https://code.jquery.com/jquery-3.3.1.min.js"
-  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <script src="http://d3js.org/d3.v4.min.js"></script>
 <script>
   var percentColors = [{
@@ -118,11 +115,7 @@ font-family: arial" id="info-box">
 
     //Create zoom/pan listener
     //Change [1,Infinity] to adjust the min/max zoom scale
-    var zoom = d3.zoom()
-      .scaleExtent([1, Infinity])
-      .on("zoom", zoomed);
 
-    svg.call(zoom);
 
     d3.json("/static/swiss-mcp.json", function (error, geodata) {
       if (error) return console.log(error); //unknown error, check the console
@@ -152,7 +145,6 @@ font-family: arial" id="info-box">
           .enter()
           .append("path")
           .attr("d", path)
-          .on("click", clicked)
           .style("fill", function (d) {
             //get the data value
             if (typeof d.properties.votePercentage !== 'undefined') {
@@ -162,45 +154,44 @@ font-family: arial" id="info-box">
               return "#83E1F8";
             }
           })
+          .attr("mcpId", function (d) {
+            return d.properties.id
+          })
           .on("mouseover", function (d) {
-            var box = $('#info-box');
-            box.css("left", (d3.event.pageX - 250) + "px")
-              .css("top", (d3.event.pageY - 50) + "px")
-              .css("display", "block")
-            $('#pop').html('<strong>Population:</strong> ' + d.properties.pop)
-            $('#area').html('<strong>Area:</strong> ' + d.properties.area + ' km2')
-            $('#language').html('<strong>Language:</strong> ' + d.properties.language)
-            $('#pc').html('<strong>Postal Code:</strong> ' + d.properties.pc)
-            $('#mcp').html('<strong>' + d.properties.name + '</strong>')
-            $('#flag').attr("src", d.properties.flag)
+            $("[mcpId='" + d.properties.id + "']").popover({
+              title: d.properties.name,
+              html: true,
+              content: '<p id="mcp"></p></div> Area: ' +
+                d.properties.area + ' km<sup>2</sup> <br/> Population: ' +
+                d.properties.pop + ' <br/> Language: ' +
+                d.properties.language + ' <br/> Postal Code: ' +
+                d.properties.pc + ' <br/> Postal Code: ',
+              container: 'body',
+              placement: 'top',
+              template: '<div class="popover" role="tooltip"><div class="arrow"></div><img src="' + d
+                .properties.flag +
+                '" style="width:30px;height:30px; float: left; margin: 10px" id="flag"></img><h3 class="popover-header"></h3><div class="popover-body"></div></div>'
+            }).popover("show")
           })
           .on("mouseout", function (d) {
-            $('#info-box').css("display", "none")
+            $("[mcpId='" + d.properties.id + "']")
+              .popover("hide")
           });
 
       });
     });
 
-    //Update map on zoom/pan
-    function zoomed() {
-      features.attr("transform", "translate(" + zoom.translate() + ")scale(" + zoom.scale() + ")")
-        .selectAll("path").style("stroke-width", 1 / zoom.scale() + "px");
-    }
+
     // Add optional onClick events for features here
     // d.properties contains the attributes (e.g. d.properties.name, d.properties.population)
-    function clicked(d, i) {
-
-
-    }
-
+    function clicked(d, i) {}
   };
-
-
   // Draw first map
   drawMap($("#voteSelect").val());
 
 
   $("#voteSelect").change(function () {
+
     drawMap($(this).val());
   });
 </script>
