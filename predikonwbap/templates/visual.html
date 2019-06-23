@@ -42,10 +42,7 @@ font-family: arial" id="info-box">
 
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"
   integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-<script src="http://d3js.org/d3.v3.min.js"></script>
-
-<script src="../static/js/paper-kit.js"></script>
-<script src="../static/js/d3-bootstrap.js"></script>
+<script src="http://d3js.org/d3.v4.min.js"></script>
 <script>
   var percentColors = [{
       pct: 0.0,
@@ -99,13 +96,13 @@ font-family: arial" id="info-box">
     height = 385;
 
   //Map projection
-  var projection = d3.geo.mercator()
+  var projection = d3.geoMercator()
     .scale(7199.647436311883)
     .center([8.223981, 46.82243520556143]) //projection center
     .translate([width / 2, height / 2]) //translate to center the map in view
 
   //Generate paths based on projection
-  var path = d3.geo.path()
+  var path = d3.geoPath()
     .projection(projection);
 
   var drawMap = function (voteId) {
@@ -121,7 +118,7 @@ font-family: arial" id="info-box">
 
     //Create zoom/pan listener
     //Change [1,Infinity] to adjust the min/max zoom scale
-    var zoom = d3.behavior.zoom()
+    var zoom = d3.zoom()
       .scaleExtent([1, Infinity])
       .on("zoom", zoomed);
 
@@ -146,11 +143,7 @@ font-family: arial" id="info-box">
             geodata.features[n].properties.flag = dbdata.data[municip].flag;
             geodata.features[n].properties.pc = dbdata.data[municip].postal_code;
             geodata.features[n].properties.language = dbdata.data[municip].language;
-
           }
-
-
-
         }
 
         //Create a path for each map feature in the data
@@ -164,16 +157,12 @@ font-family: arial" id="info-box">
             //get the data value
             if (typeof d.properties.votePercentage !== 'undefined') {
               var votePercentage = d.properties.votePercentage;
-
               return getColorForPercentage(votePercentage);
             } else {
-
               return "#83E1F8";
             }
-
           })
           .on("mouseover", function (d) {
-
             var box = $('#info-box');
             box.css("left", (d3.event.pageX - 250) + "px")
               .css("top", (d3.event.pageY - 50) + "px")
@@ -184,7 +173,6 @@ font-family: arial" id="info-box">
             $('#pc').html('<strong>Postal Code:</strong> ' + d.properties.pc)
             $('#mcp').html('<strong>' + d.properties.name + '</strong>')
             $('#flag').attr("src", d.properties.flag)
-
           })
           .on("mouseout", function (d) {
             $('#info-box').css("display", "none")

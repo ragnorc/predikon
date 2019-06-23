@@ -4,10 +4,13 @@
 
 <div class="section">
     <div class="container">
-        <div id="mapContainer" class="row justify-content-center">
-
+        <div id="mapContainer" style="float:left; width:50%" class="row justify-content-center"></div>
+        <div id="svdContainer" style="width:50%" class="row justify-content-center">
 
         </div>
+
+
+
     </div>
     <div style="display:none;
 position: absolute;
@@ -16,7 +19,7 @@ left: 0px;
 z-index: 1;
 background-color: #ffffff;
 color: rgb(0, 0, 0);
-height:300px;
+height:250px;
 width:200px;
 border: 1px solid rgb(0, 0, 0);
 border-radius: 7px;
@@ -30,15 +33,90 @@ font-family: arial" id="info-box">
         </div>
         <p style="margin-top:30px" id="pop"></p>
         <p id="area"></p>
+        <p id="pc"></p>
+        <p id="language"></p>
     </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"
     integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <script src="http://d3js.org/d3.v4.min.js"></script>
+<script>
+    // set the dimensions and margins of the graph
+    var margin = {
+            top: 10,
+            right: 30,
+            bottom: 30,
+            left: 60
+        },
+        width = 460 - margin.left - margin.right,
+        height = 400 - margin.top - margin.bottom;
 
-<script src="../static/js/paper-kit.js"></script>
-<script src="../static/js/d3-bootstrap.js"></script>
+    var svg = d3.select("#svdContainer").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform",
+            "translate(" + margin.left + "," + margin.top + ")")
+
+
+
+
+    d3.csv("/static/voteMatrix.csv", function (error, data) {
+        if (error) return console.log(error); //unknown error, check the console
+
+        console.log((data))
+        // Add X axis
+        var x = d3.scaleLinear()
+            .domain([2.5, -2.5])
+            .range([0, width])
+
+        // Add Y axis
+        var y = d3.scaleLinear()
+            .domain([-2.5, 2.5])
+            .range([0, height]);
+        svg.append("g")
+            .attr("transform", "translate(0," + y(0) + ")")
+            .call(d3.axisBottom(x).tickSize(0))
+            .selectAll("text").remove()
+
+
+        svg.append("g")
+            .attr("transform", "translate(" + x(0) + ",0)")
+            .call(d3.axisLeft(y).tickSize(0))
+            .selectAll("text").remove();
+
+
+        // Add dots
+        svg.append('g')
+            .selectAll("dot")
+            .data(data)
+            .enter()
+            .append("circle")
+            .attr("mcpId", function (d) {
+                return Math.round(d.mcp_ogd);
+            })
+
+            .attr("cx", function (d) {
+                return x(d.x);
+            })
+            .attr("cy", function (d) {
+                return y(d.y);
+            })
+            .attr("r", 1.5)
+            .style("fill", "#69b3a2")
+            .on("mouseover", function (d) {
+                $("[mcpId='" + Math.round(d.mcp_ogd) + "']")
+                    .css("opacity", "0.3")
+                    .css("stroke", "black")
+                    .css("stroke-width", "2px")
+
+            })
+            .on("mouseout", function (d) {
+                $("[mcpId='" + Math.round(d.mcp_ogd) + "']").css("opacity", "1").css("stroke-width", "0px")
+            })
+    });
+</script>
 <script>
     var percentColors = [{
             pct: 0.0,
@@ -87,68 +165,118 @@ font-family: arial" id="info-box">
         // or output as hex if preferred
     }
 
+    //Map dimensions (in pixels)
+    var width2 = 600,
+        height2 = 385;
+
+    //Map projection
+    var projection = d3.geoMercator()
+        .scale(7199.647436311883)
+        .center([8.223981, 46.82243520556143]) //projection center
+        .translate([width2 / 2, height2 / 2]) //translate to center the map in view
+
+    //Generate paths based on projection
+    var path2 = d3.geoPath()
+        .projection(projection);
 
 
-    // set the dimensions and margins of the graph
-    var margin = {
-            top: 10,
-            right: 30,
-            bottom: 30,
-            left: 60
-        },
-        width = 460 - margin.left - margin.right,
-        height = 400 - margin.top - margin.bottom;
 
-    var svg = d3.select("#mapContainer").append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform",
-            "translate(" + margin.left + "," + margin.top + ")")
+    var svg2 = d3.select("#mapContainer").append("svg")
+        .attr("width", width2)
+        .attr("height", height2);
 
+    //Group for the map features
+    var features2 = svg2.append("g")
+        .attr("class", "features");
 
-    d3.csv("/static/voteMatrix.csv", function (error, data) {
+    //Create zoom/pan listener
+    //Change [1,Infinity] to adjust the min/max zoom scale
+    var zoom2 = d3.zoom()
+        .scaleExtent([1, Infinity])
+        .on("zoom", zoomed);
+
+    svg2.call(zoom2);
+
+    d3.json("/static/swiss-mcp.json", function (error, geodata) {
         if (error) return console.log(error); //unknown error, check the console
 
-        // Add X axis
-        var x = d3.scaleLinear()
-            .domain([2.5, -2.5])
-            .range([0, width])
+        d3.json("/get_vote_results/1", function (error, dbdata) {
+            if (error) return console.log(error); //unknown error, check the console
 
-        // Add Y axis
-        var y = d3.scaleLinear()
-            .domain([-2.5, 2.5])
-            .range([0, height]);
-        svg.append("g")
-            .attr("transform", "translate(0," + y(0) + ")")
-            .call(d3.axisBottom(x).tickSize(0))
-            .selectAll("text").remove()
+            for (var n = 0; n < geodata.features.length; n++) {
+                var municip = geodata.features[n].properties.shapeid;
 
+                if (typeof dbdata.data[municip] !== 'undefined') {
+                    geodata.features[n].properties.id = municip;
+                    geodata.features[n].properties.votePercentage = dbdata.data[municip]
+                        .numYes / dbdata.data[municip]
+                        .numTotal;
+                    geodata.features[n].properties.pop = dbdata.data[municip].pop;
+                    geodata.features[n].properties.area = dbdata.data[municip].area;
+                    geodata.features[n].properties.name = dbdata.data[municip].name;
+                    geodata.features[n].properties.flag = dbdata.data[municip].flag;
+                    geodata.features[n].properties.pc = dbdata.data[municip].postal_code;
+                    geodata.features[n].properties.language = dbdata.data[municip].language;
+                }
+            }
 
-        svg.append("g")
-            .attr("transform", "translate(" + x(0) + ",0)")
-            .call(d3.axisLeft(y).tickSize(0))
-            .selectAll("text").remove();
+            //Create a path for each map feature in the data
+            features2.selectAll("path")
+                .data(geodata.features)
+                .enter()
+                .append("path")
+                .attr("d", path2)
+                .attr("mcpId", function (d) {
+                    return Math.round(d.properties.id);
+                })
+                .style("fill", function (d) {
+                    //get the data value
+                    if (typeof d.properties.language !== 'undefined') {
+                        switch (d.properties.language) {
+                            case "German":
+                                return "green"
+                            case "French":
+                                return "orange"
+                            case "Swiss Standard German":
+                                return "blue"
+                            default:
+                                return "grey"
+                        }
 
+                    } else {
+                        return "#grey";
+                    }
+                })
+                .on("mouseover", function (d) {
+                    var box = $('#info-box');
+                    box.css("left", (d3.event.pageX - 250) + "px")
+                        .css("top", (d3.event.pageY - 50) + "px")
+                        .css("display", "block")
+                    $('#pop').html('<strong>Population:</strong> ' + d.properties.pop)
+                    $('#area').html('<strong>Area:</strong> ' + d.properties.area + ' km2')
+                    $('#language').html('<strong>Language:</strong> ' + d.properties.language)
+                    $('#pc').html('<strong>Postal Code:</strong> ' + d.properties.pc)
+                    $('#mcp').html('<strong>' + d.properties.name + '</strong>')
+                    $('#flag').attr("src", d.properties.flag)
+                })
+                .on("mouseout", function (d) {
+                    $('#info-box').css("display", "none")
+                });
 
-        // Add dots
-        svg.append('g')
-            .selectAll("dot")
-            .data(data)
-            .enter()
-            .append("circle")
-            .attr("cx", function (d) {
-                return x(d.x);
-            })
-            .attr("cy", function (d) {
-                return y(d.y);
-            })
-            .attr("r", 1.5)
-            .style("fill", "#69b3a2")
-
-
-
+        });
     });
+
+    //Update map on zoom/pan
+    function zoomed() {
+        features.attr("transform", "translate(" + zoom2.translate() + ")scale(" + zoom2.scale() + ")")
+            .selectAll("path").style("stroke-width", 1 / zoom2.scale() + "px");
+    }
+    // Add optional onClick events for features here
+    // d.properties contains the attributes (e.g. d.properties.name, d.properties.population)
+    function clicked(d, i) {
+
+
+    }
 </script>
 
 
