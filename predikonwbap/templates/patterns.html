@@ -12,30 +12,6 @@
 
 
     </div>
-    <div style="display:none;
-position: absolute;
-top: 0px;
-left: 0px;
-z-index: 1;
-background-color: #ffffff;
-color: rgb(0, 0, 0);
-height:250px;
-width:200px;
-border: 1px solid rgb(0, 0, 0);
-border-radius: 7px;
-box-shadow: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
-padding: 5px;
-font-size:10px;
-font-family: arial" id="info-box">
-        <div style="justify-content: center">
-            <img style="width:30px;height:30px; float: left; margin: 10px" id="flag"></img>
-            <p id="mcp"></p>
-        </div>
-        <p style="margin-top:30px" id="pop"></p>
-        <p id="area"></p>
-        <p id="pc"></p>
-        <p id="language"></p>
-    </div>
 </div>
 
 <script src="http://d3js.org/d3.v4.min.js"></script>
@@ -63,7 +39,6 @@ font-family: arial" id="info-box">
     d3.csv("/static/svdMatrix.csv", function (error, data) {
         if (error) return console.log(error); //unknown error, check the console
 
-        console.log((data))
         // Add X axis
         var x = d3.scaleLinear()
             .domain([2.5, -2.5])
@@ -104,14 +79,15 @@ font-family: arial" id="info-box">
             .attr("r", 1.5)
             .style("fill", "#69b3a2")
             .on("mouseover", function (d) {
-                $("[mcpId='" + Math.round(d.mcp_ogd) + "']")
-                    .css("opacity", "0.3")
-                    .css("stroke", "black")
-                    .css("stroke-width", "2px")
+
+                $("#mapContainer").find("[mcpId='" + Math.round(d.mcp_ogd) + "']").triggerSVGEvent(
+                    'mouseover').css(
+                    "opacity", "0.3")
 
             })
             .on("mouseout", function (d) {
-                $("[mcpId='" + Math.round(d.mcp_ogd) + "']").css("opacity", "1").css("stroke-width", "0px")
+                $("[mcpId='" + Math.round(d.mcp_ogd) + "']").css("opacity", "1")
+                    .popover("hide")
             })
     });
 </script>
@@ -246,19 +222,26 @@ font-family: arial" id="info-box">
                     }
                 })
                 .on("mouseover", function (d) {
-                    var box = $('#info-box');
-                    box.css("left", (d3.event.pageX - 250) + "px")
-                        .css("top", (d3.event.pageY - 50) + "px")
-                        .css("display", "block")
-                    $('#pop').html('<strong>Population:</strong> ' + d.properties.pop)
-                    $('#area').html('<strong>Area:</strong> ' + d.properties.area + ' km2')
-                    $('#language').html('<strong>Language:</strong> ' + d.properties.language)
-                    $('#pc').html('<strong>Postal Code:</strong> ' + d.properties.pc)
-                    $('#mcp').html('<strong>' + d.properties.name + '</strong>')
-                    $('#flag').attr("src", d.properties.flag)
+                    $("#mapContainer").find("[mcpId='" + d.properties.id + "']").popover({
+                        title: d.properties.name,
+                        html: true,
+                        content: '<p id="mcp"></p></div> Area: ' +
+                            d.properties.area + ' km<sup>2</sup> <br/> Population: ' +
+                            d.properties.pop + ' <br/> Language: ' +
+                            d.properties.language + ' <br/> Postal Code: ' +
+                            d.properties.pc,
+                        container: 'body',
+                        placement: 'top',
+                        template: '<div class="popover" role="tooltip"><div class="arrow"></div><img src="' +
+                            d
+                            .properties.flag +
+                            '" style="width:30px;height:30px; float: left; margin: 10px" id="flag"></img><h3 class="popover-header"></h3><div class="popover-body"></div></div>'
+                    }).popover("show").css(
+                        "opacity", "0.3")
                 })
                 .on("mouseout", function (d) {
-                    $('#info-box').css("display", "none")
+                    $("[mcpId='" + d.properties.id + "']")
+                        .popover("hide").css("opacity", "1")
                 });
 
         });

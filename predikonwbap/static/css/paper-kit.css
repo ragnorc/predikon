@@ -1962,8 +1962,7 @@ textarea.form-control {
   font-weight: 400;
   padding: 0;
   z-index: 1031;
-  -webkit-box-shadow: none;
-  box-shadow: none;
+  box-shadow: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
 }
 
 .popover-header {
