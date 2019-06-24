@@ -52,3 +52,10 @@ def get_svd():
         vals[i] = trip[2]
     matrix = sp.coo_matrix((vals, (rows, cols))).todense()
     return matrix[1][1]
+
+
+@app.route('/get_mcp_data')
+def get_mpc_data():
+    res = query_db('SELECT name, ogd_id, postal_code  FROM municipality')
+    mcpDict = {ogd_id: {"title": name, "ogd_id":ogd_id, "postal_code": postal_code, "category": "Municipality"} for name, ogd_id, postal_code in res}
+    return jsonify({'data': mcpDict})

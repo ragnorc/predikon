@@ -70,64 +70,33 @@
 <script src="{{ url_for('static', filename='js/predikon.js') }}"></script>
 
 <script type="text/javascript">
-  var categoryContent = [{
-      category: 'South America',
-      title: 'Brazil'
-    },
-    {
-      category: 'South America',
-      title: 'Peru'
-    },
-    {
-      category: 'North America',
-      title: 'Canada'
-    },
-    {
-      category: 'Asia',
-      title: 'South Korea'
-    },
-    {
-      category: 'Asia',
-      title: 'Japan'
-    },
-    {
-      category: 'Asia',
-      title: 'China'
-    },
-    {
-      category: 'Europe',
-      title: 'Denmark'
-    },
-    {
-      category: 'Europe',
-      title: 'England'
-    },
-    {
-      category: 'Europe',
-      title: 'France'
-    },
-    {
-      category: 'Europe',
-      title: 'Germany'
-    },
-    {
-      category: 'Africa',
-      title: 'Ethiopia'
-    },
-    {
-      category: 'Africa',
-      title: 'Nigeria'
-    },
-    {
-      category: 'Africa',
-      title: 'Zimbabwe'
-    },
-  ];
-  $('.ui.search')
-    .search({
-      type: 'category',
-      source: categoryContent
-    });
+  var searchContent = [{
+    category: "Municipality",
+    title: "test",
+    sdfd: "df"
+  }];
+
+
+  $.ajax({
+    type: "get",
+    url: "get_mcp_data",
+    success: function (res) {
+      //console.log the response
+      console.log(res.data);
+      const data = Object.entries(res.data).map((e) => searchContent.push(e[1]));
+      $('.ui.search')
+        .search({
+          type: 'category',
+          source: searchContent,
+          onSelect: function (result, response) {
+            $("#mapContainer").find("[mcpId='" + result.ogd_id + "']").triggerSVGEvent(
+              'mouseover')
+            console.log(result)
+          }
+        });
+
+    }
+  });
 </script>
 
 <!-- Optional JavaScript -->
