@@ -177,9 +177,9 @@
 
             for (var n = 0; n < geodata.features.length; n++) {
                 var municip = geodata.features[n].properties.shapeid;
+                geodata.features[n].properties.id = municip;
 
                 if (typeof dbdata.data[municip] !== 'undefined') {
-                    geodata.features[n].properties.id = municip;
                     geodata.features[n].properties.votePercentage = dbdata.data[municip]
                         .numYes / dbdata.data[municip]
                         .numTotal;

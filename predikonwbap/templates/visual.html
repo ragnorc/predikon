@@ -100,9 +100,9 @@
 
         for (var n = 0; n < geodata.features.length; n++) {
           var municip = geodata.features[n].properties.shapeid;
-
+          geodata.features[n].properties.id = municip;
           if (typeof dbdata.data[municip] !== 'undefined') {
-            geodata.features[n].properties.id = municip;
+
             geodata.features[n].properties.votePercentage = dbdata.data[municip].numYes / dbdata.data[municip]
               .numTotal;
             geodata.features[n].properties.pop = dbdata.data[municip].pop;
@@ -137,10 +137,10 @@
               title: d.properties.name,
               html: true,
               content: '<p id="mcp"></p></div> Area: ' +
-                d.properties.area + ' km<sup>2</sup> <br/> Population: ' +
-                d.properties.pop + ' <br/> Language: ' +
-                d.properties.language + ' <br/> Postal Code: ' +
-                d.properties.pc,
+                (d.properties.area || "No data") + ' km<sup>2</sup> <br/> Population: ' +
+                (d.properties.pop || "No data") + ' <br/> Language: ' +
+                (d.properties.language || "No data") + ' <br/> Postal Code: ' +
+                (d.properties.pc || "No data"),
               container: 'body',
               placement: 'top',
               template: '<div class="popover" role="tooltip"><div class="arrow"></div><img src="' + d
