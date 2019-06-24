@@ -79,21 +79,31 @@
 
   $.ajax({
     type: "get",
-    url: "get_mcp_data",
-    success: function (res) {
-      //console.log the response
-      console.log(res.data);
-      const data = Object.entries(res.data).map((e) => searchContent.push(e[1]));
-      $('.ui.search')
-        .search({
-          type: 'category',
-          source: searchContent,
-          onSelect: function (result, response) {
-            $("#mapContainer").find("[mcpId='" + result.ogd_id + "']").triggerSVGEvent(
-              'mouseover')
-            console.log(result)
-          }
-        });
+    url: "get_vote_data",
+    success: function (voteRes) {
+
+      Object.entries(voteRes.data).map((e) => searchContent.push(e[1]));
+
+      $.ajax({
+        type: "get",
+        url: "get_mcp_data",
+        success: function (mcpRes) {
+
+          Object.entries(mcpRes.data).map((e) => searchContent.push(e[1]));
+          $('.ui.search')
+            .search({
+              type: 'category',
+              source: searchContent,
+              onSelect: function (result, response) {
+                $("#mapContainer").find("[mcpId='" + result.ogd_id + "']").triggerSVGEvent(
+                  'mouseover')
+                console.log(result)
+              }
+            });
+
+        }
+      });
+
 
     }
   });
