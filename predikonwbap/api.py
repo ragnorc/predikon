@@ -59,3 +59,10 @@ def get_mpc_data():
     res = query_db('SELECT name, ogd_id, postal_code  FROM municipality')
     mcpDict = {ogd_id: {"title": name, "ogd_id":ogd_id, "postal_code": postal_code, "category": "Municipality"} for name, ogd_id, postal_code in res}
     return jsonify({'data': mcpDict})
+
+
+@app.route('/get_vote_data')
+def get_vote_data():
+    res = query_db('SELECT title_fr, ogd_id  FROM vote')
+    voteDict = {ogd_id: {"title": title, "ogd_id":ogd_id, "category": "Vote"} for title, ogd_id in res}
+    return jsonify({'data': voteDict})
