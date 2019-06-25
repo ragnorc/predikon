@@ -114,6 +114,9 @@ def about():
 def patterns():
     return render_template('patterns.html')
 
+@app.route('/remapping')
+def remapping():
+    return render_template('remapping.html')
 
 
 @app.route('/visual')

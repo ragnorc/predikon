@@ -34,17 +34,17 @@
 
 
 
-    d3.csv("/static/svdMatrix.csv", function (error, data) {
+    d3.csv("/static/tsneMatrix.csv", function (error, data) {
         if (error) return console.log(error); //unknown error, check the console
 
         // Add X axis
         var x = d3.scaleLinear()
-            .domain([2.5, -2.5])
+            .domain([70, -70])
             .range([0, width])
 
         // Add Y axis
         var y = d3.scaleLinear()
-            .domain([-2.5, 2.5])
+            .domain([70, -70])
             .range([0, height]);
         svg.append("g")
             .attr("transform", "translate(0," + y(0) + ")")
