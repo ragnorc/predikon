@@ -63,6 +63,6 @@ def get_mpc_data():
 
 @app.route('/get_vote_data')
 def get_vote_data():
-    res = query_db('SELECT title_fr, ogd_id  FROM vote')
-    voteDict = {ogd_id: {"title": title, "ogd_id":ogd_id, "category": "Vote"} for title, ogd_id in res}
+    res = query_db('SELECT title_fr, ogd_id, id  FROM vote')
+    voteDict = {ogd_id: {"title": title, "ogd_id":ogd_id, "vote_id":vote_id, "category": "Vote"} for title, ogd_id, vote_id in res}
     return jsonify({'data': voteDict})
