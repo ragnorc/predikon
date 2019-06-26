@@ -36600,7 +36600,7 @@ a.ui.nag {
 .ui.search > .results .result .title {
   margin: -0.14285714em 0em 0em;
   font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
-  font-weight: bold;
+  font-weight: normal;
   font-size: 1em;
   color: rgba(0, 0, 0, 0.85);
 }

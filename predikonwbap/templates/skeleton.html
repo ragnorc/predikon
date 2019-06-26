@@ -94,6 +94,15 @@
             .search({
               type: 'category',
               source: searchContent,
+              onSearchQuery: function () {
+                // here you modify theresponse object,
+                // then you return the modified version.
+                var searchTerm = $(".prompt").val();
+                var reg = "(" + searchTerm + ")(?![^<]*>|[^<>]*</)";
+                var regex = new RegExp(reg, "gi");
+                var html = $('.title').html();
+                $(".title").html(html.replace(regex, '<strong>$&</strong>'));
+              },
               onSelect: function (result, response) {
                 switch (result.category) {
                   case "Municipality":
@@ -104,11 +113,6 @@
                     window.location.href = '/vote_results/' + result.vote_id;
                 }
 
-
-
-
-
-                console.log(result)
               }
             });
 
