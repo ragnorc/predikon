@@ -73,97 +73,87 @@
   var path = d3.geoPath()
     .projection(projection);
 
-  var drawMap = function (voteId) {
-    //Create an SVG
-    d3.select("svg").remove();
-    var svg = d3.select("#mapContainer").append("svg")
-      .attr("width", width)
-      .attr("height", height);
 
-    //Group for the map features
-    var features = svg.append("g")
-      .attr("class", "features");
+  //Create an SVG
+  var svg = d3.select("#mapContainer").append("svg")
+    .attr("width", width)
+    .attr("height", height);
 
-    //Create zoom/pan listener
-    //Change [1,Infinity] to adjust the min/max zoom scale
+  //Group for the map features
+  var features = svg.append("g")
+    .attr("class", "features");
+
+  //Create zoom/pan listener
+  //Change [1,Infinity] to adjust the min/max zoom scale
 
 
-    d3.json("/static/swiss-mcp.json", function (error, geodata) {
-      if (error) return console.log(error); //unknown error, check the console
+  d3.json("/static/swiss-mcp.json", function (error, geodata) {
+    if (error) return console.log(error); //unknown error, check the console
 
-      var voteDict = JSON.parse('{{ voteDict | tojson | safe}}');
+    var voteDict = JSON.parse('{{ voteDict | tojson | safe}}');
 
-      for (var n = 0; n < geodata.features.length; n++) {
-        var municip = geodata.features[n].properties.shapeid;
-        geodata.features[n].properties.id = municip;
-        if (typeof voteDict[municip] !== 'undefined') {
+    for (var n = 0; n < geodata.features.length; n++) {
+      var municip = geodata.features[n].properties.shapeid;
+      geodata.features[n].properties.id = municip;
+      if (typeof voteDict[municip] !== 'undefined') {
 
-          geodata.features[n].properties.votePercentage = voteDict[municip].numYes / voteDict[municip]
-            .numTotal;
-          geodata.features[n].properties.pop = voteDict[municip].pop;
-          geodata.features[n].properties.area = voteDict[municip].area;
-          geodata.features[n].properties.name = voteDict[municip].name;
-          geodata.features[n].properties.flag = voteDict[municip].flag;
-          geodata.features[n].properties.pc = voteDict[municip].postal_code;
-          geodata.features[n].properties.language = voteDict[municip].language;
-        }
+        geodata.features[n].properties.votePercentage = voteDict[municip].numYes / voteDict[municip]
+          .numTotal;
+        geodata.features[n].properties.pop = voteDict[municip].pop;
+        geodata.features[n].properties.area = voteDict[municip].area;
+        geodata.features[n].properties.name = voteDict[municip].name;
+        geodata.features[n].properties.flag = voteDict[municip].flag;
+        geodata.features[n].properties.pc = voteDict[municip].postal_code;
+        geodata.features[n].properties.language = voteDict[municip].language;
       }
+    }
 
-      //Create a path for each map feature in the data
-      features.selectAll("path")
-        .data(geodata.features)
-        .enter()
-        .append("path")
-        .attr("d", path)
-        .style("fill", function (d) {
-          //get the data value
-          if (typeof d.properties.votePercentage !== 'undefined') {
-            var votePercentage = d.properties.votePercentage;
-            return getColorForPercentage(votePercentage);
-          } else {
-            return "#83E1F8";
-          }
-        })
-        .attr("mcpId", function (d) {
-          return d.properties.id
-        })
-        .on("mouseover", function (d) {
-          $("[mcpId='" + d.properties.id + "']").popover({
-            title: d.properties.name,
-            html: true,
-            content: '<p id="mcp"></p></div> Area: ' +
-              (d.properties.area || "No data") + ' km<sup>2</sup> <br/> Population: ' +
-              (d.properties.pop || "No data") + ' <br/> Language: ' +
-              (d.properties.language || "No data") + ' <br/> Postal Code: ' +
-              (d.properties.pc || "No data"),
-            container: 'body',
-            placement: 'top',
-            template: '<div class="popover" role="tooltip"><div class="arrow"></div><img src="' + d
-              .properties.flag +
-              '" style="width:30px;height:30px; float: left; margin: 10px" id="flag"></img><h3 class="popover-header"></h3><div class="popover-body"></div></div>'
-          }).popover("show")
-        })
-        .on("mouseout", function (d) {
-          $("[mcpId='" + d.properties.id + "']")
-            .popover("hide")
-        });
-
-
-    });
+    //Create a path for each map feature in the data
+    features.selectAll("path")
+      .data(geodata.features)
+      .enter()
+      .append("path")
+      .attr("d", path)
+      .style("fill", function (d) {
+        //get the data value
+        if (typeof d.properties.votePercentage !== 'undefined') {
+          var votePercentage = d.properties.votePercentage;
+          return getColorForPercentage(votePercentage);
+        } else {
+          return "#83E1F8";
+        }
+      })
+      .attr("mcpId", function (d) {
+        return d.properties.id
+      })
+      .on("mouseover", function (d) {
+        $("[mcpId='" + d.properties.id + "']").popover({
+          title: d.properties.name,
+          html: true,
+          content: '<p id="mcp"></p></div> Area: ' +
+            (d.properties.area || "No data") + ' km<sup>2</sup> <br/> Population: ' +
+            (d.properties.pop || "No data") + ' <br/> Language: ' +
+            (d.properties.language || "No data") + ' <br/> Postal Code: ' +
+            (d.properties.pc || "No data"),
+          container: 'body',
+          placement: 'top',
+          template: '<div class="popover" role="tooltip"><div class="arrow"></div><img src="' + d
+            .properties.flag +
+            '" style="width:30px;height:30px; float: left; margin: 10px" id="flag"></img><h3 class="popover-header"></h3><div class="popover-body"></div></div>'
+        }).popover("show")
+      })
+      .on("mouseout", function (d) {
+        $("[mcpId='" + d.properties.id + "']")
+          .popover("hide")
+      });
 
 
-    // Add optional onClick events for features here
-    // d.properties contains the attributes (e.g. d.properties.name, d.properties.population)
-    function clicked(d, i) {}
-  };
-  // Draw first map
-  drawMap($("#voteSelect").val());
-
-
-  $("#voteSelect").change(function () {
-
-    drawMap($(this).val());
   });
+
+
+  // Add optional onClick events for features here
+  // d.properties contains the attributes (e.g. d.properties.name, d.properties.population)
+  function clicked(d, i) {}
 </script>
 
 
