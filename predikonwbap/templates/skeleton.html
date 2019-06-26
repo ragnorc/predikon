@@ -99,9 +99,14 @@
                 // then you return the modified version.
                 var searchTerm = $(".prompt").val();
                 var reg = "(" + searchTerm + ")(?![^<]*>|[^<>]*</)";
-                var regex = new RegExp(reg, "gi");
-                var html = $('.title').html();
-                $(".title").html(html.replace(regex, '<strong>$&</strong>'));
+                $(".result").each(function () {
+                  var elem = $(this).find(".title");
+                  var html = elem.html();
+                  elem.html(html.replace(new RegExp(reg, "gi"), (match) =>
+                    `<strong>${match}</strong>`));
+
+                })
+
               },
               onSelect: function (result, response) {
                 switch (result.category) {
