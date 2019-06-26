@@ -10,7 +10,7 @@
       <a class="navbar-brand" href="{{ url_for('index') }}">Predikon</a>
     </div>
     <div class="collapse navbar-collapse" id="navbarToggler">
-      <ul class="navbar-nav ml-auto">
+      <ul class="navbar-nav mr-auto">
         <li class="nav-item">
           <div class="ui search" style='padding:1rem'>
             <div class="ui icon input">
@@ -20,14 +20,30 @@
             <div class="results"></div>
           </div>
         </li>
-        <li class="nav-item">
-          <a href="{{ url_for('visual') }}" class="nav-link">Visualization</a>
-        </li>
+
         <li class="nav-item">
           <a href="{{ url_for('patterns') }}" class="nav-link">Voting Patterns</a>
         </li>
         <li class="nav-item">
           <a href="{{ url_for('remapping') }}" class="nav-link">Remapping</a>
+        </li>
+        <li class="nav-item dropdown">
+
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            Vote Results
+          </a>
+          <div class="dropdown-menu" style=" max-height: 500px;
+          overflow-y: auto;
+          overflow-x: hidden;" aria-labelledby="navbarDropdown">
+
+            {% for vote in voteList %}
+            <a class="dropdown-item" style="width: 500px;
+            display: block;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;" href="/vote_results/{{vote.id}}">{{vote.title}}</a>
+            {% endfor %}
         </li>
         <li class="nav-item">
           <a href="{{ url_for('about') }}" class="nav-link">About</a>

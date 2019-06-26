@@ -4,11 +4,7 @@
 
 <div class="section">
   <div class="container">
-    <select style="max-width:200px;" id="voteSelect">
-      {% for vote in voteList %}
-      <option value="{{vote.id}}">{{vote.title}}</option>
-      {% endfor %}
-    </select>
+    <h3>Popular initiative proposed May 30, 2013</h3>
     <div id="mapContainer" class="row justify-content-center">
 
 
@@ -95,7 +91,7 @@
     d3.json("/static/swiss-mcp.json", function (error, geodata) {
       if (error) return console.log(error); //unknown error, check the console
 
-      d3.json("/get_vote_results/" + voteId, function (error, dbdata) {
+      d3.json("/get_vote_results/{{id}}", function (error, dbdata) {
         if (error) return console.log(error); //unknown error, check the console
 
         for (var n = 0; n < geodata.features.length; n++) {

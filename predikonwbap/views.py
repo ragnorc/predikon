@@ -46,6 +46,10 @@ def query_db(query, args=(), one=False):
     cur.close()
     return (rv[0] if rv else None) if one else rv
 
+with app.app_context():
+    res = query_db('SELECT id, title_fr from vote')
+    voteList = [{'id': id, 'title' : title} for id,title in res]
+
 
 @app.route('/')
 def index():
@@ -101,8 +105,9 @@ def index():
             'is_live': is_live,
             'counting': int(counting * 100)
         })
+        
 
-    return render_template('index.html', votes=votes)
+    return render_template('index.html', votes=votes, voteList=voteList)
 
 
 @app.route('/about')
@@ -112,17 +117,15 @@ def about():
 
 @app.route('/patterns')
 def patterns():
-    return render_template('patterns.html')
+    return render_template('patterns.html', voteList=voteList)
 
 @app.route('/remapping')
 def remapping():
-    return render_template('remapping.html')
+    return render_template('remapping.html', voteList=voteList)
 
 
-@app.route('/visual')
-def visual():
-    res = query_db('SELECT id, title_fr from vote')
-    voteList = [{'id': id, 'title' : title} for id,title in res]
-    print(voteList)
-    return render_template('visual.html', voteList=voteList)
+@app.route('/vote_results/<int:id>')
+def vote_results(id):
+    
+    return render_template('vote_results.html', voteList=voteList, id=id)
 
