@@ -1,6 +1,6 @@
 from datetime import datetime as dt
 from datetime import time
-from flask import render_template, g
+from flask import render_template, g, jsonify
 from predikondata import Vote, Prediction, Result
 from predikonwbap import app
 import sqlite3
@@ -49,6 +49,9 @@ def query_db(query, args=(), one=False):
 with app.app_context():
     res = query_db('SELECT id, title_fr from vote')
     voteList = [{'id': id, 'title' : title} for id,title in res]
+    res = query_db('SELECT municipality.ogd_id, municipality.population_size, municipality.area, municipality.name, municipality.flag, municipality.postal_code, municipality.language FROM municipality')
+    mcpDict = {id : {"pop": pop, "area": area, "name": name, "flag": flag, "postal_code": postal_code, "language":language} for id,pop,area,name,flag,postal_code,language in res}
+    
 
 
 @app.route('/')
@@ -117,15 +120,17 @@ def about():
 
 @app.route('/patterns')
 def patterns():
-    return render_template('patterns.html', voteList=voteList)
+    return render_template('patterns.html', voteList=voteList, mcpDict=mcpDict)
 
 @app.route('/remapping')
 def remapping():
-    return render_template('remapping.html', voteList=voteList)
+    return render_template('remapping.html', voteList=voteList, mcpDict=mcpDict)
 
 
 @app.route('/vote_results/<int:id>')
 def vote_results(id):
-    
-    return render_template('vote_results.html', voteList=voteList, id=id)
+    res = query_db('SELECT municipality.ogd_id, result.num_yes, result.num_total, municipality.population_size, municipality.area, municipality.name, municipality.flag, municipality.postal_code, municipality.language, vote.title_fr FROM result, municipality, vote where result.municipality_id == municipality.id AND vote.id == result.vote_id AND vote.id =={}'.format(id))
+    voteDict = {id : { "numYes": numYes, "numTotal" : numTotal, "pop": pop, "area": area, "name": name, "flag": flag, "postal_code": postal_code, "language":language, "title":title} for id,numYes,numTotal,pop,area,name,flag,postal_code,language,title in res}
+    print(voteDict.popitem())
+    return render_template('vote_results.html', voteList=voteList, voteDict=voteDict, title=voteDict.popitem()[1]["title"])
 

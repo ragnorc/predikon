@@ -4,7 +4,7 @@
 
 <div class="section">
   <div class="container">
-    <h3>Popular initiative proposed May 30, 2013</h3>
+    <h3>{{title}}</h3>
     <div id="mapContainer" class="row justify-content-center">
 
 
@@ -91,65 +91,64 @@
     d3.json("/static/swiss-mcp.json", function (error, geodata) {
       if (error) return console.log(error); //unknown error, check the console
 
-      d3.json("/get_vote_results/{{id}}", function (error, dbdata) {
-        if (error) return console.log(error); //unknown error, check the console
+      var voteDict = JSON.parse('{{ voteDict | tojson | safe}}');
 
-        for (var n = 0; n < geodata.features.length; n++) {
-          var municip = geodata.features[n].properties.shapeid;
-          geodata.features[n].properties.id = municip;
-          if (typeof dbdata.data[municip] !== 'undefined') {
+      for (var n = 0; n < geodata.features.length; n++) {
+        var municip = geodata.features[n].properties.shapeid;
+        geodata.features[n].properties.id = municip;
+        if (typeof voteDict[municip] !== 'undefined') {
 
-            geodata.features[n].properties.votePercentage = dbdata.data[municip].numYes / dbdata.data[municip]
-              .numTotal;
-            geodata.features[n].properties.pop = dbdata.data[municip].pop;
-            geodata.features[n].properties.area = dbdata.data[municip].area;
-            geodata.features[n].properties.name = dbdata.data[municip].name;
-            geodata.features[n].properties.flag = dbdata.data[municip].flag;
-            geodata.features[n].properties.pc = dbdata.data[municip].postal_code;
-            geodata.features[n].properties.language = dbdata.data[municip].language;
-          }
+          geodata.features[n].properties.votePercentage = voteDict[municip].numYes / voteDict[municip]
+            .numTotal;
+          geodata.features[n].properties.pop = voteDict[municip].pop;
+          geodata.features[n].properties.area = voteDict[municip].area;
+          geodata.features[n].properties.name = voteDict[municip].name;
+          geodata.features[n].properties.flag = voteDict[municip].flag;
+          geodata.features[n].properties.pc = voteDict[municip].postal_code;
+          geodata.features[n].properties.language = voteDict[municip].language;
         }
+      }
 
-        //Create a path for each map feature in the data
-        features.selectAll("path")
-          .data(geodata.features)
-          .enter()
-          .append("path")
-          .attr("d", path)
-          .style("fill", function (d) {
-            //get the data value
-            if (typeof d.properties.votePercentage !== 'undefined') {
-              var votePercentage = d.properties.votePercentage;
-              return getColorForPercentage(votePercentage);
-            } else {
-              return "#83E1F8";
-            }
-          })
-          .attr("mcpId", function (d) {
-            return d.properties.id
-          })
-          .on("mouseover", function (d) {
-            $("[mcpId='" + d.properties.id + "']").popover({
-              title: d.properties.name,
-              html: true,
-              content: '<p id="mcp"></p></div> Area: ' +
-                (d.properties.area || "No data") + ' km<sup>2</sup> <br/> Population: ' +
-                (d.properties.pop || "No data") + ' <br/> Language: ' +
-                (d.properties.language || "No data") + ' <br/> Postal Code: ' +
-                (d.properties.pc || "No data"),
-              container: 'body',
-              placement: 'top',
-              template: '<div class="popover" role="tooltip"><div class="arrow"></div><img src="' + d
-                .properties.flag +
-                '" style="width:30px;height:30px; float: left; margin: 10px" id="flag"></img><h3 class="popover-header"></h3><div class="popover-body"></div></div>'
-            }).popover("show")
-          })
-          .on("mouseout", function (d) {
-            $("[mcpId='" + d.properties.id + "']")
-              .popover("hide")
-          });
+      //Create a path for each map feature in the data
+      features.selectAll("path")
+        .data(geodata.features)
+        .enter()
+        .append("path")
+        .attr("d", path)
+        .style("fill", function (d) {
+          //get the data value
+          if (typeof d.properties.votePercentage !== 'undefined') {
+            var votePercentage = d.properties.votePercentage;
+            return getColorForPercentage(votePercentage);
+          } else {
+            return "#83E1F8";
+          }
+        })
+        .attr("mcpId", function (d) {
+          return d.properties.id
+        })
+        .on("mouseover", function (d) {
+          $("[mcpId='" + d.properties.id + "']").popover({
+            title: d.properties.name,
+            html: true,
+            content: '<p id="mcp"></p></div> Area: ' +
+              (d.properties.area || "No data") + ' km<sup>2</sup> <br/> Population: ' +
+              (d.properties.pop || "No data") + ' <br/> Language: ' +
+              (d.properties.language || "No data") + ' <br/> Postal Code: ' +
+              (d.properties.pc || "No data"),
+            container: 'body',
+            placement: 'top',
+            template: '<div class="popover" role="tooltip"><div class="arrow"></div><img src="' + d
+              .properties.flag +
+              '" style="width:30px;height:30px; float: left; margin: 10px" id="flag"></img><h3 class="popover-header"></h3><div class="popover-body"></div></div>'
+          }).popover("show")
+        })
+        .on("mouseout", function (d) {
+          $("[mcpId='" + d.properties.id + "']")
+            .popover("hide")
+        });
 
-      });
+
     });
 
 
