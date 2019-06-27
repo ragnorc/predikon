@@ -4,13 +4,40 @@
 
 <div class="section">
     <div class="container">
-        <div id="mapContainer" style="float:left; width:50%" class="row justify-content-center"></div>
-        <div id="svdContainer" style="width:50%" class="row justify-content-center">
-
+        <h2>Remapping Switzerland with t-SNE</h2>
+        <p>Below, each municipality is represented by a dot in the plot on the right-hand side. On the left, the
+            geographical map of Switzerland depicts the municipalities with a colour that is chosen based on the
+            position in the plot.</p>
+        <div style="padding-top: 50px; padding-bottom: 50px;">
+            <div id="mapContainer" style="float:left; width:50%" class="row justify-content-center"></div>
+            <div id="svdContainer" style="width:50%" class="row justify-content-center"></div>
         </div>
+        <h3>Explanation</h3>
+        <p> On the right part above, each municipality is shown by a dot. This representation is obtained directly from
+            all the results to national-level issue votes, using a dimensionality reduction technique called t-SNE (for
+            t-distributed stochastic neighbor embedding).</p>
 
+        <p> In contrast to principal component analysis as used in the voting patterns, t-SNE enables to capture
+            non-linear relationships present in the voting data. Informally, it captures the relative similarity between
+            municipalities in the data and it tries to keep these similarities in a two-dimensional space. Hence, it is
+            potentially able to reveal more insights in two dimensions and generate the visualization above. However, it
+            lacks the easy interpretability of individual axes.</p>
 
+        <p> In line with the principal component analysis, we observe a clustering in voting behavior by the language
+            spoken in each municipality. However, even more remarkable, a finer sub-clustering by canton is also
+            obtained. For example, spot the cluster corresponding to the canton of Bern: the German-speaking
+            municipalities are located on right hand side of the plot and the French-speaking municipalities are located
+            on the left hand side of the plot. First, municipalities of Bern are split by the language spoken and then
+            grouped together within their cantonal sub-cluster. As also apparent in the principal component analysis,
+            the canton of Wallis exhibits a unique voting behavior. It is isolated at the top of the plot, but it is
+            still split according to the two spoken languages.</p>
 
+        <p>The drop-down menu allows you to choose the data used to color the dots that represent the municipalities.
+            The most interesting data to look at are the canton a municipality belongs to. To reduce the number of
+            elements in the legend, it is possible to choose only cantons that speak a specific language.</p>
+
+        <p> On the left hand side above, the color of each municipality is directly determined by its position in the
+            two-dimensional space on the right side.</p>
     </div>
 </div>
 <script>
