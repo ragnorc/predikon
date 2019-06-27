@@ -81,7 +81,8 @@
 
   //Group for the map features
   var features = svg.append("g")
-    .attr("class", "features");
+    .attr("class", "features")
+
 
   //Create zoom/pan listener
   //Change [1,Infinity] to adjust the min/max zoom scale
@@ -114,6 +115,8 @@
       .enter()
       .append("path")
       .attr("d", path)
+      .style("stroke", "black")
+      .style("stroke-width", '0.1px')
       .style("fill", function (d) {
         //get the data value
         if (typeof d.properties.votePercentage !== 'undefined') {

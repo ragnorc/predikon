@@ -202,6 +202,8 @@
             .attr("mcpId", function (d) {
                 return Math.round(d.properties.id);
             })
+            .style("stroke", "black")
+            .style("stroke-width", '0.25px')
             .style("fill", function (d) {
                 //get the data value
                 if (typeof d.properties.language !== 'undefined') {
