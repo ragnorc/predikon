@@ -77,13 +77,14 @@
             .attr("r", 1.5)
             .style("fill", "#69b3a2")
             .on("mouseover", function (d) {
-
+                d3.select(this).style("stroke", "black")
+                    .style("stroke-width", '2px')
                 $("#mapContainer").find("[mcpId='" + Math.round(d.mcp_ogd) + "']").triggerSVGEvent(
-                    'mouseover').css(
-                    "opacity", "0.3")
-
+                    'mouseover')
             })
             .on("mouseout", function (d) {
+                d3.select(this)
+                    .style("stroke-width", '0px')
                 $("[mcpId='" + Math.round(d.mcp_ogd) + "']").css("opacity", "1")
                     .popover("hide")
             })
@@ -225,6 +226,7 @@
                 }
             })
             .on("mouseover", function (d) {
+                $("path").popover('hide');
                 $("#mapContainer").find("[mcpId='" + d.properties.id + "']").popover({
                     title: d.properties.name,
                     html: true,

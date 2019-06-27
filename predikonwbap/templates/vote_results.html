@@ -130,24 +130,27 @@
         return d.properties.id
       })
       .on("mouseover", function (d) {
+        $("path").popover('hide');
         $("[mcpId='" + d.properties.id + "']").popover({
-          title: d.properties.name,
-          html: true,
-          content: '<p id="mcp"></p></div> Area: ' +
-            (d.properties.area || "No data") + ' km<sup>2</sup> <br/> Population: ' +
-            (d.properties.pop || "No data") + ' <br/> Language: ' +
-            (d.properties.language || "No data") + ' <br/> Postal Code: ' +
-            (d.properties.pc || "No data"),
-          container: 'body',
-          placement: 'top',
-          template: '<div class="popover" role="tooltip"><div class="arrow"></div><img src="' + d
-            .properties.flag +
-            '" style="width:30px;height:30px; float: left; margin: 10px" id="flag"></img><h3 class="popover-header"></h3><div class="popover-body"></div></div>'
-        }).popover("show")
+            title: d.properties.name,
+            html: true,
+            content: '<p id="mcp"></p></div> Area: ' +
+              (d.properties.area || "No data") + ' km<sup>2</sup> <br/> Population: ' +
+              (d.properties.pop || "No data") + ' <br/> Language: ' +
+              (d.properties.language || "No data") + ' <br/> Postal Code: ' +
+              (d.properties.pc || "No data"),
+            container: 'body',
+            placement: 'top',
+            template: '<div class="popover" role="tooltip"><div class="arrow"></div><img src="' + d
+              .properties.flag +
+              '" style="width:30px;height:30px; float: left; margin: 10px" id="flag"></img><h3 class="popover-header"></h3><div class="popover-body"></div></div>'
+          }).popover("show")
+          .css(
+            "opacity", "0.3")
       })
       .on("mouseout", function (d) {
         $("[mcpId='" + d.properties.id + "']")
-          .popover("hide")
+          .popover("hide").css("opacity", "1")
       });
 
 
