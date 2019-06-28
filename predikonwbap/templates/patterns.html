@@ -33,7 +33,8 @@
     </div>
 </div>
 <script>
-    // set the dimensions and margins of the graph
+</script>
+<script>
     var margin = {
             top: 10,
             right: 30,
@@ -50,76 +51,15 @@
         .attr("transform",
             "translate(" + margin.left + "," + margin.top + ")")
 
-
-
-
-    d3.csv("/static/svdMatrix.csv", function (error, data) {
-        if (error) return console.log(error); //unknown error, check the console
-        console.log(data)
-        // Add X axis
-        var x = d3.scaleLinear()
-            .domain([2, -2])
-            .range([0, width])
-
-        // Add Y axis
-        var y = d3.scaleLinear()
-            .domain([-2.5, 2.5])
-            .range([0, height]);
-        svg.append("g")
-            .attr("transform", "translate(0," + y(0) + ")")
-            .call(d3.axisBottom(x).tickSize(0))
-            .selectAll("text").remove()
-
-
-        svg.append("g")
-            .attr("transform", "translate(" + x(0) + ",0)")
-            .call(d3.axisLeft(y).tickSize(0))
-            .selectAll("text").remove();
-
-
-        // Add dots
-        svg.append('g')
-            .selectAll("dot")
-            .data(data)
-            .enter()
-            .append("circle")
-            .attr("mcpId", function (d) {
-                return Math.round(d.mcp_ogd);
-            })
-
-            .attr("cx", function (d) {
-                return x(d.x);
-            })
-            .attr("cy", function (d) {
-                return y(d.y);
-            })
-            .attr("r", 2)
-            .style("fill", "#69b3a2")
-            .on("mouseover", function (d) {
-                d3.select(this).style("stroke", "black")
-                    .style("stroke-width", '2px')
-                $("#mapContainer").find("[mcpId='" + Math.round(d.mcp_ogd) + "']").triggerSVGEvent(
-                    'mouseover')
-
-            })
-            .on("mouseout", function (d) {
-                d3.select(this)
-                    .style("stroke-width", '0px')
-                $("[mcpId='" + Math.round(d.mcp_ogd) + "']").css("opacity", "1")
-                    .popover("hide")
-            })
-    });
-</script>
-<script>
     //Map dimensions (in pixels)
-    var width2 = 600,
-        height2 = 385;
+    var mapWidth = 600,
+        mapHeight = 385;
 
     //Map projection
     var projection = d3.geoMercator()
         .scale(7199.647436311883)
         .center([8.223981, 46.82243520556143]) //projection center
-        .translate([width2 / 2, height2 / 2]) //translate to center the map in view
+        .translate([mapWidth / 2, mapHeight / 2]) //translate to center the map in view
 
     //Generate paths based on projection
     var path2 = d3.geoPath()
@@ -128,8 +68,8 @@
 
 
     var svg2 = d3.select("#mapContainer").append("svg")
-        .attr("width", width2)
-        .attr("height", height2);
+        .attr("width", mapWidth)
+        .attr("height", mapHeight);
 
     //Group for the map features
     var features2 = svg2.append("g")
@@ -175,13 +115,64 @@
 
             }
         }
-        console.log(minSVD)
         var scale1 = d3.scaleLinear()
-            .range(["#4070FF", "#3DFF4F"])
+            .range(["#009FFF", "#ec2F4B"])
             .domain([minSVD[0], maxSVD[0]]);
         var scale2 = d3.scaleLinear()
-            .range(["#FF4B4B", "#4070FF"])
+            .range(["#38ef7d", "#ec2F4B"])
             .domain([minSVD[1], maxSVD[1]]);
+
+
+
+
+
+
+
+
+        // Add X axis
+        var x = d3.scaleLinear()
+            .domain([2, -2])
+            .range([0, width])
+
+        // Add Y axis
+        var y = d3.scaleLinear()
+            .domain([-2.5, 2.5])
+            .range([0, height]);
+        svg.append("g")
+            .attr("transform", "translate(0," + y(0) + ")")
+            .call(d3.axisBottom(x).tickSize(0))
+            .selectAll("text").remove()
+
+
+        svg.append("g")
+            .attr("transform", "translate(" + x(0) + ",0)")
+            .call(d3.axisLeft(y).tickSize(0))
+            .selectAll("text").remove();
+
+
+        // Add dots
+        svg.append('g')
+            .selectAll("dot")
+            .data(geodata.features)
+            .enter()
+            .append("circle")
+            .attr("mcpId", function (d) {
+                return d.properties.id
+            })
+
+            .attr("cx", function (d) {
+
+                return x(d.properties.svd_1 || 0);
+            })
+            .attr("cy", function (d) {
+                return y(d.properties.svd_2 || 0);
+            })
+            .attr("r", function (d) {
+                return (d.properties.svd_1 == null || d.properties.svd_2 == null) ? 0 : 2;
+            })
+            .style("fill", "#69b3a2")
+            .on("mouseover", mouseOverEvent)
+            .on("mouseout", mouseOutEvent)
 
         //Create a path for each map feature in the data
         features2.selectAll("path")
@@ -198,33 +189,42 @@
                 return d3.scaleLinear()
                     .range([scale1(d.properties.svd_1), scale2(d.properties.svd_2)])(0.5)
             })
-            .on("mouseover", function (d) {
-                $("path").popover('hide');
-                $("#mapContainer").find("[mcpId='" + d.properties.id + "']").popover({
-                    trigger: 'focus',
-                    title: d.properties.name,
-                    html: true,
-                    content: '<p id="mcp"></p></div> Area: ' +
-                        d.properties.area + ' km<sup>2</sup> <br/> Population: ' +
-                        d.properties.pop + ' <br/> Language: ' +
-                        d.properties.language + ' <br/> Postal Code: ' +
-                        d.properties.pc,
-                    container: 'body',
-                    placement: 'top',
-                    template: '<div class="popover" role="tooltip"><div class="arrow"></div><img src="' +
-                        d
-                        .properties.flag +
-                        '" style="width:30px;height:30px; float: left; margin: 10px" id="flag"></img><h3 class="popover-header"></h3><div class="popover-body"></div></div>'
-                }).popover("show").css(
-                    "opacity", "0.3")
-            })
-            .on("mouseout", function (d) {
-                $("[mcpId='" + d.properties.id + "']")
-                    .popover("hide").css("opacity", "1")
-            });
+            .on("mouseover", mouseOverEvent)
+            .on("mouseout", mouseOutEvent)
 
 
     });
+
+    function mouseOverEvent(d) {
+        $("path").popover('hide');
+        $("#mapContainer").find("[mcpId='" + d.properties.id + "']").css(
+            "opacity", "0.3").eq(0).popover({
+            trigger: 'focus',
+            title: d.properties.name,
+            html: true,
+            content: '<p id="mcp"></p></div> Area: ' +
+                d.properties.area + ' km<sup>2</sup> <br/> Population: ' +
+                d.properties.pop + ' <br/> Language: ' +
+                d.properties.language + ' <br/> Postal Code: ' +
+                d.properties.pc,
+            container: 'body',
+            placement: 'top',
+            template: '<div class="popover" role="tooltip"><div class="arrow"></div><img src="' +
+                d
+                .properties.flag +
+                '" style="width:30px;height:30px; float: left; margin: 10px" id="flag"></img><h3 class="popover-header"></h3><div class="popover-body"></div></div>'
+        }).popover("show");
+        $("#svdContainer").find("[mcpId='" + d.properties.id + "']").css("stroke", "black")
+            .css("stroke-width", '2px');
+    }
+
+    function mouseOutEvent(d) {
+        $("[mcpId='" + d.properties.id + "']")
+            .popover("hide").css("opacity", "1")
+        $("#svdContainer").find("[mcpId='" + d.properties.id + "']").css("stroke", "black")
+            .css("stroke-width", '0px');
+
+    };
 
     //Update map on zoom/pan
     function zoomed() {
