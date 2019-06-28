@@ -55,7 +55,7 @@
 
     d3.csv("/static/svdMatrix.csv", function (error, data) {
         if (error) return console.log(error); //unknown error, check the console
-
+        console.log(data)
         // Add X axis
         var x = d3.scaleLinear()
             .domain([2, -2])
@@ -111,53 +111,6 @@
     });
 </script>
 <script>
-    var percentColors = [{
-            pct: 0.0,
-            color: {
-                r: 0xff,
-                g: 0x00,
-                b: 0
-            }
-        },
-        {
-            pct: 0.5,
-            color: {
-                r: 0xff,
-                g: 0xff,
-                b: 0
-            }
-        },
-        {
-            pct: 1.0,
-            color: {
-                r: 0x00,
-                g: 0x80,
-                b: 0
-            }
-        }
-    ];
-
-    var getColorForPercentage = function (pct) {
-        for (var i = 1; i < percentColors.length - 1; i++) {
-            if (pct < percentColors[i].pct) {
-                break;
-            }
-        }
-        var lower = percentColors[i - 1];
-        var upper = percentColors[i];
-        var range = upper.pct - lower.pct;
-        var rangePct = (pct - lower.pct) / range;
-        var pctLower = 1 - rangePct;
-        var pctUpper = rangePct;
-        var color = {
-            r: Math.floor(lower.color.r * pctLower + upper.color.r * pctUpper),
-            g: Math.floor(lower.color.g * pctLower + upper.color.g * pctUpper),
-            b: Math.floor(lower.color.b * pctLower + upper.color.b * pctUpper)
-        };
-        return 'rgb(' + [color.r, color.g, color.b].join(',') + ')';
-        // or output as hex if preferred
-    }
-
     //Map dimensions (in pixels)
     var width2 = 600,
         height2 = 385;
@@ -194,6 +147,8 @@
         if (error) return console.log(error); //unknown error, check the console
 
         var mcpDict = JSON.parse('{{ mcpDict | tojson | safe}}');
+        var minSVD = [100, 100];
+        var maxSVD = [-100, -100];
 
         for (var n = 0; n < geodata.features.length; n++) {
             var municip = geodata.features[n].properties.shapeid;
@@ -209,8 +164,24 @@
                 geodata.features[n].properties.flag = mcpDict[municip].flag;
                 geodata.features[n].properties.pc = mcpDict[municip].postal_code;
                 geodata.features[n].properties.language = mcpDict[municip].language;
+                geodata.features[n].properties.svd_1 = mcpDict[municip].svd_1;
+                geodata.features[n].properties.svd_2 = mcpDict[municip].svd_2;
+
+
+                if (mcpDict[municip].svd_1 <= minSVD[0]) minSVD[0] = mcpDict[municip].svd_1;
+                if (mcpDict[municip].svd_1 >= maxSVD[0]) maxSVD[0] = mcpDict[municip].svd_1;
+                if (mcpDict[municip].svd_1 <= minSVD[1]) minSVD[1] = mcpDict[municip].svd_2;
+                if (mcpDict[municip].svd_1 >= maxSVD[1]) maxSVD[1] = mcpDict[municip].svd_2;
+
             }
         }
+        console.log(minSVD)
+        var scale1 = d3.scaleLinear()
+            .range(["#4070FF", "#3DFF4F"])
+            .domain([minSVD[0], maxSVD[0]]);
+        var scale2 = d3.scaleLinear()
+            .range(["#FF4B4B", "#4070FF"])
+            .domain([minSVD[1], maxSVD[1]]);
 
         //Create a path for each map feature in the data
         features2.selectAll("path")
@@ -224,24 +195,8 @@
             .style("stroke", "black")
             .style("stroke-width", '0.25px')
             .style("fill", function (d) {
-                //get the data value
-                if (typeof d.properties.language !== 'undefined') {
-                    switch (d.properties.language) {
-                        case "German":
-                            return "green"
-                        case "French":
-                            return "blue"
-                        case "Swiss Standard German":
-                            return "orange"
-                        case "Italian":
-                            return "red"
-                        default:
-                            return "grey"
-                    }
-
-                } else {
-                    return "#grey";
-                }
+                return d3.scaleLinear()
+                    .range([scale1(d.properties.svd_1), scale2(d.properties.svd_2)])(0.5)
             })
             .on("mouseover", function (d) {
                 $("path").popover('hide');
