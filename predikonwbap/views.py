@@ -49,8 +49,8 @@ def query_db(query, args=(), one=False):
 with app.app_context():
     res = query_db('SELECT id, title_fr from vote')
     voteList = [{'id': id, 'title' : title} for id,title in res]
-    res = query_db('SELECT ogd_id, population_size, area, name, flag, postal_code, language, svd_1, svd_2 FROM municipality')
-    mcpDict = {id : {"pop": pop, "area": area, "name": name, "flag": flag, "postal_code": postal_code, "language":language, "svd_1":svd_1,"svd_2":svd_2 } for id,pop,area,name,flag,postal_code,language,svd_1,svd_2 in res}
+    res = query_db('SELECT ogd_id, population_size, area, name, flag, postal_code, language, svd_1, svd_2, tsne_1, tsne_2 FROM municipality')
+    mcpDict = {id : {"pop": pop, "area": area, "name": name, "flag": flag, "postal_code": postal_code, "language":language,"svd_1":svd_1,"svd_2":svd_2, "tsne_1":tsne_1,"tsne_2":tsne_2 } for id,pop,area,name,flag,postal_code,language,svd_1,svd_2,tsne_1,tsne_2 in res}
     
 
 

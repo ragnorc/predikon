@@ -9,8 +9,8 @@
             today. Two municipalities with similar colors have similar voting habits.
             Observe for instance the differences between urban centers and rural areas, or between the different
             linguistic regions.</p>
-        <div id="mapContainer" style="float:left; width:50%" class="row justify-content-center"></div>
-        <div id="svdContainer" style="width:50%" class="row justify-content-center"></div>
+        <div id="mapContainer" style="float:left; margin-right:20px" class="row justify-content-center"></div>
+        <div id="svdContainer" class="row justify-content-center"></div>
         <h3>Explanation</h3>
         <p>On the right part above, each municipality is shown by a dot. This representation is obtained directly
             from all the results to national-level issue votes, using a dimensionality reduction technique. Overall,
@@ -33,23 +33,14 @@
     </div>
 </div>
 <script>
-</script>
-<script>
-    var margin = {
-            top: 10,
-            right: 30,
-            bottom: 30,
-            left: 60
-        },
-        width = 460 - margin.left - margin.right,
-        height = 400 - margin.top - margin.bottom;
+    width = 400
+    height = 400
 
     var svg = d3.select("#svdContainer").append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
+        .attr("width", width)
+        .attr("height", height)
         .append("g")
-        .attr("transform",
-            "translate(" + margin.left + "," + margin.top + ")")
+
 
     //Map dimensions (in pixels)
     var mapWidth = 600,
