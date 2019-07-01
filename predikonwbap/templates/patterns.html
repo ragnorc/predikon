@@ -13,7 +13,6 @@
         <select id="coloringSelector">
             <option value="language">Language</option>
             <option value="canton">Canton</option>
-
         </select>
         <div id="svdContainer" style="width:400px; height:400px" class="row justify-content-center"></div>
         <h3>Explanation</h3>
@@ -78,8 +77,8 @@
 
         data = geodata.features;
         var mcpDict = JSON.parse('{{ mcpDict | tojson | safe}}');
-        var minSVD = [100, 100];
-        var maxSVD = [-100, -100];
+        var minValue = [100, 100];
+        var maxValue = [-100, -100];
 
 
         for (var n = 0; n < geodata.features.length; n++) {
@@ -104,20 +103,20 @@
                 if (!(geodata.features[n].properties.canton in cantonColors)) cantonColors[geodata.features[n]
                     .properties.canton] = colors[(Object.keys(cantonColors).length % colors.length + colors
                     .length) % colors.length]
-                if (mcpDict[municip].svd_1 <= minSVD[0]) minSVD[0] = mcpDict[municip].svd_1;
-                if (mcpDict[municip].svd_1 >= maxSVD[0]) maxSVD[0] = mcpDict[municip].svd_1;
-                if (mcpDict[municip].svd_1 <= minSVD[1]) minSVD[1] = mcpDict[municip].svd_2;
-                if (mcpDict[municip].svd_1 >= maxSVD[1]) maxSVD[1] = mcpDict[municip].svd_2;
+                if (mcpDict[municip].svd_1 <= minValue[0]) minValue[0] = mcpDict[municip].svd_1;
+                if (mcpDict[municip].svd_1 >= maxValue[0]) maxValue[0] = mcpDict[municip].svd_1;
+                if (mcpDict[municip].svd_1 <= minValue[1]) minValue[1] = mcpDict[municip].svd_2;
+                if (mcpDict[municip].svd_1 >= maxValue[1]) maxValue[1] = mcpDict[municip].svd_2;
 
             }
         }
         console.log(cantonColors)
         var scale1 = d3.scaleLinear()
             .range(["#009FFF", "#ec2F4B"])
-            .domain([minSVD[0], maxSVD[0]]);
+            .domain([minValue[0], maxValue[0]]);
         var scale2 = d3.scaleLinear()
             .range(["#38ef7d", "#ec2F4B"])
-            .domain([minSVD[1], maxSVD[1]]);
+            .domain([minValue[1], maxValue[1]]);
 
 
 
