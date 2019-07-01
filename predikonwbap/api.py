@@ -4,8 +4,6 @@ from predikonwbap import app
 from flask import g
 import sqlite3
 import os
-import numpy as np
-import scipy.sparse as sp
 
 
 
@@ -38,20 +36,6 @@ def get_vote_results(id):
     res = query_db('SELECT municipality.ogd_id, result.num_yes, result.num_total, municipality.population_size, municipality.area, municipality.name, municipality.flag, municipality.postal_code, municipality.language FROM result, municipality, vote where result.municipality_id == municipality.id AND vote.id == result.vote_id AND vote.id =={}'.format(id))
     voteDict = {id : { "numYes": numYes, "numTotal" : numTotal, "pop": pop, "area": area, "name": name, "flag": flag, "postal_code": postal_code, "language":language} for id,numYes,numTotal,pop,area,name,flag,postal_code,language in res}
     return jsonify({'data': voteDict})
-
-
-@app.route('/get_svd')
-def get_svd():
-    res = query_db('SELECT municipality.id as mcp_id, vote.id as vote_id, ROUND(result.num_yes * 100.0 / result.num_total, 1)/100 AS percentage  FROM result, municipality, vote where result.municipality_id == municipality.id AND vote.id == result.vote_id ')
-    rows = np.zeros(len(res)).astype(np.int64)
-    cols = np.zeros(len(res)).astype(np.int64)
-    vals = np.zeros(len(res))
-    for i,trip in enumerate(res):
-        rows[i] = trip[0]
-        cols[i] = trip[1]
-        vals[i] = trip[2]
-    matrix = sp.coo_matrix((vals, (rows, cols))).todense()
-    return matrix[1][1]
 
 
 @app.route('/get_mcp_data')
