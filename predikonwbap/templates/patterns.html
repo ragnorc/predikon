@@ -10,7 +10,12 @@
             Observe for instance the differences between urban centers and rural areas, or between the different
             linguistic regions.</p>
         <div id="mapContainer" style="float:left; margin-right:20px" class="row justify-content-center"></div>
-        <div id="svdContainer" class="row justify-content-center"></div>
+        <select id="coloringSelector">
+            <option value="language">Language</option>
+            <option value="canton">Canton</option>
+
+        </select>
+        <div id="svdContainer" style="width:400px; height:400px" class="row justify-content-center"></div>
         <h3>Explanation</h3>
         <p>On the right part above, each municipality is shown by a dot. This representation is obtained directly
             from all the results to national-level issue votes, using a dimensionality reduction technique. Overall,
@@ -33,18 +38,20 @@
     </div>
 </div>
 <script>
+    const colors = [
+        '#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c',
+        '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1',
+        '#000075', '#808080', '#000000'
+    ];
+    cantonColors = {};
+
+    data = [];
     width = 400
     height = 400
-
-    var svg = d3.select("#svdContainer").append("svg")
-        .attr("width", width)
-        .attr("height", height)
-        .append("g")
-
-
     //Map dimensions (in pixels)
     var mapWidth = 600,
         mapHeight = 385;
+
 
     //Map projection
     var projection = d3.geoMercator()
@@ -66,20 +73,14 @@
     var features2 = svg2.append("g")
         .attr("class", "features");
 
-    //Create zoom/pan listener
-    //Change [1,Infinity] to adjust the min/max zoom scale
-    var zoom2 = d3.zoom()
-        .scaleExtent([1, Infinity])
-        .on("zoom", zoomed);
-
-    svg2.call(zoom2);
-
     d3.json("/static/swiss-mcp.json", function (error, geodata) {
         if (error) return console.log(error); //unknown error, check the console
 
+        data = geodata.features;
         var mcpDict = JSON.parse('{{ mcpDict | tojson | safe}}');
         var minSVD = [100, 100];
         var maxSVD = [-100, -100];
+
 
         for (var n = 0; n < geodata.features.length; n++) {
             var municip = geodata.features[n].properties.shapeid;
@@ -94,11 +95,15 @@
                 geodata.features[n].properties.name = mcpDict[municip].name;
                 geodata.features[n].properties.flag = mcpDict[municip].flag;
                 geodata.features[n].properties.pc = mcpDict[municip].postal_code;
+                geodata.features[n].properties.canton = mcpDict[municip].canton;
                 geodata.features[n].properties.language = mcpDict[municip].language;
                 geodata.features[n].properties.svd_1 = mcpDict[municip].svd_1;
                 geodata.features[n].properties.svd_2 = mcpDict[municip].svd_2;
 
 
+                if (!(geodata.features[n].properties.canton in cantonColors)) cantonColors[geodata.features[n]
+                    .properties.canton] = colors[(Object.keys(cantonColors).length % colors.length + colors
+                    .length) % colors.length]
                 if (mcpDict[municip].svd_1 <= minSVD[0]) minSVD[0] = mcpDict[municip].svd_1;
                 if (mcpDict[municip].svd_1 >= maxSVD[0]) maxSVD[0] = mcpDict[municip].svd_1;
                 if (mcpDict[municip].svd_1 <= minSVD[1]) minSVD[1] = mcpDict[municip].svd_2;
@@ -106,6 +111,7 @@
 
             }
         }
+        console.log(cantonColors)
         var scale1 = d3.scaleLinear()
             .range(["#009FFF", "#ec2F4B"])
             .domain([minSVD[0], maxSVD[0]]);
@@ -114,56 +120,6 @@
             .domain([minSVD[1], maxSVD[1]]);
 
 
-
-
-
-
-
-
-        // Add X axis
-        var x = d3.scaleLinear()
-            .domain([2, -2])
-            .range([0, width])
-
-        // Add Y axis
-        var y = d3.scaleLinear()
-            .domain([-2.5, 2.5])
-            .range([0, height]);
-        svg.append("g")
-            .attr("transform", "translate(0," + y(0) + ")")
-            .call(d3.axisBottom(x).tickSize(0))
-            .selectAll("text").remove()
-
-
-        svg.append("g")
-            .attr("transform", "translate(" + x(0) + ",0)")
-            .call(d3.axisLeft(y).tickSize(0))
-            .selectAll("text").remove();
-
-
-        // Add dots
-        svg.append('g')
-            .selectAll("dot")
-            .data(geodata.features)
-            .enter()
-            .append("circle")
-            .attr("mcpId", function (d) {
-                return d.properties.id
-            })
-
-            .attr("cx", function (d) {
-
-                return x(d.properties.svd_1 || 0);
-            })
-            .attr("cy", function (d) {
-                return y(d.properties.svd_2 || 0);
-            })
-            .attr("r", function (d) {
-                return (d.properties.svd_1 == null || d.properties.svd_2 == null) ? 0 : 2;
-            })
-            .style("fill", "#69b3a2")
-            .on("mouseover", mouseOverEvent)
-            .on("mouseout", mouseOutEvent)
 
         //Create a path for each map feature in the data
         features2.selectAll("path")
@@ -184,6 +140,7 @@
             .on("mouseout", mouseOutEvent)
 
 
+        drawScatter(geodata.features, $('#coloringSelector').val())
     });
 
     function mouseOverEvent(d) {
@@ -217,12 +174,116 @@
 
     };
 
-    //Update map on zoom/pan
-    function zoomed() {
-        features.attr("transform", "translate(" + zoom2.translate() + ")scale(" + zoom2.scale() + ")")
-            .selectAll("path").style("stroke-width", 1 / zoom2.scale() + "px");
+
+
+
+    $('#coloringSelector').on('change', function () {
+        d3.select("#scatterSVG").remove();
+        drawScatter(data, $('#coloringSelector').val())
+    });
+
+
+    function drawScatter(data, coloring) {
+
+        var svg = d3.select("#svdContainer").append("svg")
+            .attr("id", "scatterSVG")
+            .attr("width", width)
+            .attr("height", height)
+            .append("g")
+        // Add X axis
+        var x = d3.scaleLinear()
+            .domain([2, -2])
+            .range([0, width])
+
+        // Add Y axis
+        var y = d3.scaleLinear()
+            .domain([-2.5, 2.5])
+            .range([0, height]);
+        svg.append("g")
+            .attr("transform", "translate(0," + y(0) + ")")
+            .call(d3.axisBottom(x).tickSize(0))
+            .selectAll("text").remove()
+
+
+        svg.append("g")
+            .attr("transform", "translate(" + x(0) + ",0)")
+            .call(d3.axisLeft(y).tickSize(0))
+            .selectAll("text").remove();
+
+
+        // Add dots
+        svg.append('g')
+            .selectAll("dot")
+            .data(data)
+            .enter()
+            .append("circle")
+            .attr('type', 'data-circle')
+            .attr("mcpId", function (d) {
+                return d.properties.id
+            })
+
+            .attr("cx", function (d) {
+
+                return x(d.properties.svd_1 || 0);
+            })
+            .attr("cy", function (d) {
+                return y(d.properties.svd_2 || 0);
+            })
+            .attr("r", function (d) {
+                return (d.properties.svd_1 == null || d.properties.svd_2 == null) ? 0 : 2;
+            })
+            .style("fill", function (d) {
+
+
+                if (coloring == "language") {
+                    switch (d.properties.language) {
+                        case "German":
+                            return "#1F77B4";
+                        case "French":
+                            return "#FA7F0E";
+                        case "Italian":
+                            return "#2CA02C";
+                        case "Swiss Standard German":
+                            return "red";
+                        default:
+                            return "grey";
+
+                    }
+                } else if (coloring == "canton") {
+                    return cantonColors[d.properties.canton]
+
+                }
+            })
+            .on("mouseover", mouseOverEvent)
+            .on("mouseout", mouseOutEvent)
+
+
+
+        if (coloring == "language") {
+            svg.append("circle").attr("cx", 20).attr("cy", 30).attr("r", 6).style("fill", "red")
+            svg.append("circle").attr("cx", 20).attr("cy", 50).attr("r", 6).style("fill", "#FA7F0E")
+            svg.append("circle").attr("cx", 20).attr("cy", 70).attr("r", 6).style("fill", "#2CA02C")
+            svg.append("circle").attr("cx", 20).attr("cy", 90).attr("r", 6).style("fill", "#1F77B4")
+            svg.append("text").attr("x", 30).attr("y", 30).text("Swiss Standard German").style("font-size", "15px")
+                .attr("alignment-baseline", "middle")
+            svg.append("text").attr("x", 30).attr("y", 50).text("French").style("font-size", "15px").attr(
+                "alignment-baseline", "middle")
+            svg.append("text").attr("x", 30).attr("y", 70).text("Italian").style("font-size", "15px").attr(
+                "alignment-baseline", "middle")
+            svg.append("text").attr("x", 30).attr("y", 90).text("German").style("font-size", "15px").attr(
+                "alignment-baseline", "middle")
+
+        } else if (coloring == "canton") {
+            y = 30;
+            for (let [canton, color] of Object.entries(cantonColors)) {
+                svg.append("circle").attr("cx", 20).attr("cy", y).attr("r", 6).style("fill", color)
+                svg.append("text").attr("x", 30).attr("y", y).text(canton).style("font-size", "15px").attr(
+                    "alignment-baseline", "middle")
+                y += 20;
+            }
+
+        }
     }
 </script>
-
 
 {% endblock %}
